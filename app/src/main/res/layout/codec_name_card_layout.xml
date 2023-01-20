@@ -30,18 +30,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            style="@style/TextAppearance.Material3.BodySmall"
             app:layout_constraintTop_toBottomOf="@id/codec_name_value"
             app:layout_constraintStart_toStartOf="@id/codec_name_value" />
+
         <TextView
+            android:id="@+id/codec_type_value"
+            style="@style/TextAppearance.Material3.BodySmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/codec_type_value"
-            style="@style/TextAppearance.Material3.TitleSmall"
-            tools:text="video/avc"
+            android:layout_marginStart="4dp"
             android:ellipsize="middle"
+            app:layout_constraintBottom_toBottomOf="@+id/codec_type_title"
             app:layout_constraintStart_toEndOf="@id/codec_type_title"
             app:layout_constraintTop_toTopOf="@id/codec_type_title"
-            android:layout_marginStart="4dp"/>
+            tools:text="video/avc" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

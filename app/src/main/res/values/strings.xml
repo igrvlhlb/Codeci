@@ -4,4 +4,11 @@
     <string name="codec_type">Type:</string>
     <string name="decoders_string">Decoders</string>
     <string name="encoders_string">Encoders</string>
+    <string name="general_section">General</string>
+    <string name="canonical_name_title">Canonical Name</string>
+    <string name="is_alias_title">Is Alias:</string>
+    <string name="is_encoder_title">Is Encoder:</string>
+    <string name="is_sw_only_title">Is SW-Only:</string>
+    <string name="is_hw_accel_title">Is HW-Accel:</string>
+    <string name="supported_types_title">Supported Types:</string>
 </resources>

@@ -19,6 +19,7 @@
         android:layout_height="wrap_content"
         android:text="@string/decoders_string"
         android:id="@+id/decoders_recycler_view_title"
+        style="@style/TextAppearance.Material3.TitleMedium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="4dp"/>
@@ -28,6 +29,7 @@
         android:text="@string/encoders_string"
         android:id="@+id/encoders_recycler_view_title"
         android:layout_marginStart="4dp"
+        style="@style/TextAppearance.Material3.TitleMedium"
         app:layout_constraintStart_toEndOf="@id/recycler_view_divider"
         app:layout_constraintTop_toTopOf="parent"
         />

@@ -2,6 +2,7 @@ package com.example.codeci.ui.main
 
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
@@ -26,9 +27,8 @@ class CodecsViewModel : ViewModel() {
 
     private fun getCodecsInfos() {
         val allCodecs = MediaCodecList(MediaCodecList.ALL_CODECS).codecInfos
-        val decoders = allCodecs.filter { !it.isEncoder }
-        val encoders = allCodecs.filter { it.isEncoder }
         codecsSet = allCodecs.map { it.name to it }.toSortedSet(CodecPairComparator.INSTANCE)
+        codecsSet.forEach { Log.d("TAG", "${it.first}: ${it.second.supportedTypes.size}") }
     }
 
     private class CodecPairComparator: Comparator<MediaCodecInfoPair> {
