@@ -9,28 +9,26 @@ typealias MediaCodecInfoPair = Pair<String,MediaCodecInfo>
 
 class CodecsViewModel : ViewModel() {
     var teste: String = "Nao inicializada"
-    lateinit var decodersSet: Set<MediaCodecInfoPair>
-    lateinit var encodersSet: Set<MediaCodecInfoPair>
+    lateinit var codecsSet: Set<MediaCodecInfoPair>
 
     val decoders: List<MediaCodecInfoPair>
-        get() = decodersSet.toList()
+        get() = codecsSet.filter { !it.second.isEncoder }
     val encoders: List<MediaCodecInfoPair>
-        get() = encodersSet.toList()
+        get() = codecsSet.filter { it.second.isEncoder }
 
     init {
         getCodecsInfos()
     }
 
     private fun getCodecByName(codec: String): MediaCodecInfo {
-        return decodersSet.plus(encodersSet).find { it.first == codec }!!.second
+        return codecsSet.find { it.first == codec }!!.second
     }
 
     private fun getCodecsInfos() {
         val allCodecs = MediaCodecList(MediaCodecList.ALL_CODECS).codecInfos
         val decoders = allCodecs.filter { !it.isEncoder }
         val encoders = allCodecs.filter { it.isEncoder }
-        decodersSet = decoders.map { it.name to it }.toSortedSet(CodecPairComparator.INSTANCE)
-        encodersSet = encoders.map { it.name to it }.toSortedSet(CodecPairComparator.INSTANCE)
+        codecsSet = allCodecs.map { it.name to it }.toSortedSet(CodecPairComparator.INSTANCE)
     }
 
     private class CodecPairComparator: Comparator<MediaCodecInfoPair> {

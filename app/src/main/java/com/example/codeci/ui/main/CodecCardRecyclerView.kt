@@ -4,10 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.codeci.R
-import com.example.codeci.databinding.CodecNameCardLayoutBinding
 
 class CodecCardRecyclerView(inputData: List<MediaCodecInfoPair>, val onClick: (String) -> Unit) :
     RecyclerView.Adapter<CodecCardRecyclerView.ViewHolder>() {
