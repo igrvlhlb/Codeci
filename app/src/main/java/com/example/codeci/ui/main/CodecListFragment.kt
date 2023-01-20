@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.codeci.R
 import com.example.codeci.databinding.FragmentCodecListBinding
@@ -33,16 +34,22 @@ class CodecListFragment : Fragment() {
         //return inflater.inflate(R.layout.fragment_codec_list, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val decoders = binding.decodersRecyclerView
+        val encoders = binding.encodersRecyclerView
+        val lambda = {codec: String ->
+            Log.d(TAG, "$codec selected!!!")
+            val action =
+                CodecListFragmentDirections.actionCodecListFragmentToCodecDetailsFragment(codec)
+            findNavController().navigate(action)
+        }
+        decoders.adapter = CodecCardRecyclerView(codecsViewModel.decoders) { lambda(it) }
+        encoders.adapter = CodecCardRecyclerView(codecsViewModel.encoders) { lambda(it) }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val decoders = binding.decodersRecyclerView
-        val encoders = binding.encodersRecyclerView
-        val lambda = {codec: String -> Log.d(TAG, "$codec selected!!!")}
-        decoders.adapter = CodecCardRecyclerView(codecsViewModel.decoders) { lambda(it) }
-        encoders.adapter = CodecCardRecyclerView(codecsViewModel.encoders) { lambda(it) }
-    }
 }

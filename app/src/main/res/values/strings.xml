@@ -11,4 +11,5 @@
     <string name="is_sw_only_title">Is SW-Only:</string>
     <string name="is_hw_accel_title">Is HW-Accel:</string>
     <string name="supported_types_title">Supported Types:</string>
+    <string name="is_vendor_value">Is Vendor:</string>
 </resources>

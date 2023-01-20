@@ -21,7 +21,7 @@ class CodecsViewModel : ViewModel() {
         getCodecsInfos()
     }
 
-    private fun getCodecByName(codec: String): MediaCodecInfo {
+    fun getCodecByName(codec: String): MediaCodecInfo {
         return codecsSet.find { it.first == codec }!!.second
     }
 

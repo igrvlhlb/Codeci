@@ -36,6 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/canonical_name_value"
             style="@style/TextAppearance.Material3.BodySmall"
             tools:text="some.canonical.name"
             app:layout_constraintTop_toTopOf="@id/canonical_name_title"
@@ -52,6 +53,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/is_alias_value"
             app:layout_constraintStart_toEndOf="@id/titles_barrier"
             app:layout_constraintTop_toTopOf="@id/is_alias_title"
             style="@style/TextAppearance.Material3.BodySmall"
@@ -68,6 +70,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/is_encoder_value"
             style="@style/TextAppearance.Material3.BodySmall"
             app:layout_constraintTop_toTopOf="@id/is_encoder_title"
             app:layout_constraintStart_toEndOf="@id/titles_barrier"
@@ -84,11 +87,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/is_hardware_accelerated_value"
             app:layout_constraintTop_toTopOf="@id/is_hardware_accelerated_title"
             app:layout_constraintStart_toEndOf="@id/titles_barrier"
             style="@style/TextAppearance.Material3.BodySmall"
-            tools:text="true"
-            app:drawableEndCompat="@drawable/baseline_info_24" />
+            tools:text="true" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -101,11 +104,11 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/is_software_only_value"
             app:layout_constraintTop_toTopOf="@id/is_software_only_title"
             app:layout_constraintStart_toEndOf="@id/titles_barrier"
             style="@style/TextAppearance.Material3.BodySmall"
-            tools:text="true"
-            app:drawableEndCompat="@drawable/baseline_info_24" />
+            tools:text="true" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -113,16 +116,16 @@
             style="@style/TextAppearance.Material3.TitleSmall"
             app:layout_constraintTop_toBottomOf="@id/is_software_only_title"
             app:layout_constraintStart_toStartOf="parent"
-            android:text="Is Vendor:">
+            android:text="@string/is_vendor_value">
         </TextView>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/is_vendor_value"
             app:layout_constraintTop_toTopOf="@id/is_vendor_title"
             app:layout_constraintStart_toEndOf="@id/titles_barrier"
             style="@style/TextAppearance.Material3.BodySmall"
-            tools:text="true"
-            app:drawableEndCompat="@drawable/baseline_info_24" />
+            tools:text="true" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -138,10 +141,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/supported_types_scroll"
             app:layout_constraintTop_toBottomOf="@id/is_vendor_title"
-            app:layout_constraintStart_toEndOf="@id/titles_barrier"
-            tools:layout_width="64dp"
-            tools:layout_height="36dp"
-            >
+            app:layout_constraintStart_toEndOf="@id/titles_barrier" >
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

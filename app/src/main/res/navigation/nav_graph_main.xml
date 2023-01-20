@@ -9,5 +9,21 @@
         android:id="@+id/codecListFragment"
         android:name="com.example.codeci.ui.main.CodecListFragment"
         android:label="fragment_codec_list"
-        tools:layout="@layout/fragment_codec_list" />
+        tools:layout="@layout/fragment_codec_list" >
+        <action
+            android:id="@+id/action_codecListFragment_to_codecDetailsFragment"
+            app:destination="@id/codecDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/codecDetailsFragment"
+        android:name="com.example.codeci.ui.main.CodecDetailsFragment"
+        android:label="fragment_codec_details"
+        tools:layout="@layout/fragment_codec_details"
+        >
+        <argument
+            android:name="codec"
+            app:argType="string"
+            app:nullable="false"
+            android:defaultValue="" />
+    </fragment>
 </navigation>
