@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Codec(i)</string>
+    <string name="codec_title">Codec</string>
+    <string name="codec_type">Type:</string>
+    <string name="decoders_string">Decoders</string>
+    <string name="encoders_string">Encoders</string>
+</resources>
