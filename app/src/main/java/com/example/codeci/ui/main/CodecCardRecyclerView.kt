@@ -14,7 +14,10 @@ class CodecCardRecyclerView(inputData: List<MediaCodecInfoPair>, val onClick: (S
 
     init {
         data = inputData.map {
-            it.first to it.second.supportedTypes[0]
+            it.first to it.second.supportedTypes[0] +
+                    if (it.second.supportedTypes.size > 1)
+                        " (+${it.second.supportedTypes.size-1})"
+                    else ""
         }
     }
 

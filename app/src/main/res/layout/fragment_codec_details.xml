@@ -159,5 +159,11 @@
             app:constraint_referenced_ids="canonical_name_title,is_alias_title,is_encoder_title,is_hardware_accelerated_title,is_software_only_title,is_vendor_title,supported_types_title"
             app:barrierDirection="end"
             app:barrierMargin="24dp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="botaoz"
+            app:layout_constraintTop_toBottomOf="@id/supported_types_scroll"
+            app:layout_constraintStart_toStartOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
