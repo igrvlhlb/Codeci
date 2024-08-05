@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -37,6 +40,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.codeci.ui.main.CodecsViewModel
+import io.igrvlhlb.codeci.model.CodecType
+import io.igrvlhlb.codeci.model.HWAccel
+import io.igrvlhlb.codeci.model.MediaType
+import io.igrvlhlb.codeci.model.UIState
 import io.igrvlhlb.codeci.ui.theme.CodeciTheme
 
 class MainActivity : ComponentActivity() {
@@ -62,7 +69,7 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                 ) { innerInsets ->
-                    MainUi(innerInsets)
+                    MainUi(codecsViewModel, innerInsets)
                 }
             }
         }
@@ -71,34 +78,36 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MainUi(innerPadding: PaddingValues = PaddingValues()) {
+fun MainUi(viewModel: CodecsViewModel, innerPadding: PaddingValues = PaddingValues()) {
     Column(
         Modifier
             .padding(innerPadding)
             .fillMaxSize()) {
-        FilterMenu()
+        FilterMenu(viewModel)
+        CodecsList(viewModel)
     }
 }
 
 @Composable
-fun FilterMenu() {
+fun FilterMenu(viewModel: CodecsViewModel) {
+    val state by viewModel.state
     Row(
         horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
         modifier = Modifier.fillMaxWidth()
     ) {
         Column {
             MenuTitle(text = "Codec Type")
-            MenuComboBox(values = MediaType.entries.map { it.value })
+            MenuComboBox(state.codecType, values = CodecType.entries.map { it.value }) { viewModel.updateState(state.copy(codecType = it)) }
             Spacer(modifier = Modifier.size(8.dp))
             MenuTitle(text = "Media Type")
-            MenuComboBox(values = CodecType.entries.map { it.value })
+            MenuComboBox(state.mediaType, values = MediaType.entries.map { it.value }) { viewModel.updateState(state.copy(mediaType = it)) }
         }
         Column {
             MenuTitle(text = "Mime Types")
-            MenuComboBox(values = listOf("All"))
+            MenuComboBox(state.mimeType, values = listOf("All") + state.mimeTypeList) { viewModel.updateState(state.copy(mimeType = it)) }
             Spacer(modifier = Modifier.size(8.dp))
             MenuTitle(text = "HW Accelerated")
-            MenuComboBox(values = HWAccel.entries.map { it.value })
+            MenuComboBox(state.hwAccel, values = HWAccel.entries.map { it.value }) { viewModel.updateState(state.copy(hwAccel = it)) }
         }
     }
 }
@@ -110,9 +119,12 @@ fun MenuTitle(text: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuComboBox(values: List<String>, default: String = values.first()) {
+fun MenuComboBox(
+    selectedValue: String,
+    values: List<String>,
+    onValueSelected: (String) -> Unit = {}
+) {
     var isExpanded by remember { mutableStateOf(false) }
-    var selectedValue by rememberSaveable { mutableStateOf(default) }
 
     ExposedDropdownMenuBox(expanded = isExpanded, onExpandedChange = { isExpanded = it }) {
         TextField(
@@ -130,9 +142,21 @@ fun MenuComboBox(values: List<String>, default: String = values.first()) {
                 DropdownMenuItem(text = {
                     Text(it)
                 }, onClick = {
-                    selectedValue = it
                     isExpanded = false
+                    onValueSelected(it)
                 })
+            }
+        }
+    }
+}
+
+@Composable
+fun CodecsList(viewModel: CodecsViewModel) {
+    val state by viewModel.state
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn {
+            items(state.codecsList) { codec ->
+                Text(text = codec.name)
             }
         }
     }
@@ -142,24 +166,7 @@ fun MenuComboBox(values: List<String>, default: String = values.first()) {
 @Composable
 fun MainPreview() {
     CodeciTheme {
-        MainUi()
+        MainUi(viewModel = CodecsViewModel())
     }
 }
 
-enum class MediaType(val value: String) {
-    ALL("All"),
-    AUDIO("Audio"),
-    VIDEO("Video"),
-}
-
-enum class CodecType(val value: String) {
-    ALL("All"),
-    ENCODER("Encoder"),
-    DECODER("Decoder"),
-}
-
-enum class HWAccel(val value: String) {
-    ALL("All"),
-    YES("Yes"),
-    NO("No"),
-}
