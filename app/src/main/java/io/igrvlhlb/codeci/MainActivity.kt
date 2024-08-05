@@ -1,10 +1,14 @@
 package io.igrvlhlb.codeci
 
+import android.media.MediaCodecInfo
+import android.media.MediaCodecList
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,14 +19,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -31,19 +40,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.codeci.ui.main.CodecsViewModel
+import com.example.codeci.utils.isSoftwareCodec
 import io.igrvlhlb.codeci.model.CodecType
 import io.igrvlhlb.codeci.model.HWAccel
 import io.igrvlhlb.codeci.model.MediaType
-import io.igrvlhlb.codeci.model.UIState
 import io.igrvlhlb.codeci.ui.theme.CodeciTheme
 
 class MainActivity : ComponentActivity() {
@@ -96,30 +106,61 @@ fun FilterMenu(viewModel: CodecsViewModel) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Column {
-            MenuTitle(text = "Codec Type")
-            MenuComboBox(state.codecType, values = CodecType.entries.map { it.value }) { viewModel.updateState(state.copy(codecType = it)) }
+            FilterMenuItem(
+                text = "Codec Type",
+                selectedValue = state.codecType,
+                values = CodecType.entries.map { it.value }
+            ) {
+                viewModel.updateState(state.copy(codecType = it))
+            }
             Spacer(modifier = Modifier.size(8.dp))
-            MenuTitle(text = "Media Type")
-            MenuComboBox(state.mediaType, values = MediaType.entries.map { it.value }) { viewModel.updateState(state.copy(mediaType = it)) }
+            FilterMenuItem(
+                text = "Media Type",
+                selectedValue = state.mediaType,
+                values = MediaType.entries.map { it.value }
+            ) {
+                viewModel.updateState(state.copy(mediaType = it))
+            }
         }
         Column {
-            MenuTitle(text = "Mime Types")
-            MenuComboBox(state.mimeType, values = listOf("All") + state.mimeTypeList) { viewModel.updateState(state.copy(mimeType = it)) }
+            FilterMenuItem(
+                text = "Mime Types",
+                selectedValue = state.mimeType,
+                values = listOf("All") + state.mimeTypeList
+            ) {
+                viewModel.updateState(state.copy(mimeType = it))
+            }
             Spacer(modifier = Modifier.size(8.dp))
-            MenuTitle(text = "HW Accelerated")
-            MenuComboBox(state.hwAccel, values = HWAccel.entries.map { it.value }) { viewModel.updateState(state.copy(hwAccel = it)) }
+            FilterMenuItem(
+                text = "HW Accelerated",
+                selectedValue = state.hwAccel,
+                values = HWAccel.entries.map { it.value }
+            ) {
+                viewModel.updateState(state.copy(hwAccel = it))
+            }
         }
     }
 }
 
 @Composable
-fun MenuTitle(text: String) {
+fun FilterMenuItem(
+    text: String,
+    selectedValue: String,
+    values: List<String>,
+    onValueSelected: (String) -> Unit = {}
+) {
+    FilterMenuItemTitle(text = text)
+    FilterMenuComboBox(selectedValue, values, onValueSelected)
+}
+
+@Composable
+fun FilterMenuItemTitle(text: String) {
     Text(text = text, fontWeight = FontWeight.Bold, fontSize = 24.sp)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MenuComboBox(
+fun FilterMenuComboBox(
     selectedValue: String,
     values: List<String>,
     onValueSelected: (String) -> Unit = {}
@@ -127,17 +168,11 @@ fun MenuComboBox(
     var isExpanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(expanded = isExpanded, onExpandedChange = { isExpanded = it }) {
-        TextField(
-            value = selectedValue, onValueChange = {}, readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
-            },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            modifier = Modifier
-                .menuAnchor()
-                .size(width = 160.dp, height = Dp.Unspecified)
-        )
-        ExposedDropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+        MenuItemComboboxField(selectedValue = selectedValue, isExpanded = isExpanded)
+        ExposedDropdownMenu(
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false }
+        ) {
             values.forEach {
                 DropdownMenuItem(text = {
                     Text(it)
@@ -153,12 +188,68 @@ fun MenuComboBox(
 @Composable
 fun CodecsList(viewModel: CodecsViewModel) {
     val state by viewModel.state
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn {
-            items(state.codecsList) { codec ->
-                Text(text = codec.name)
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.wrapContentSize()
+        ) {
+            items(state.codecsList) { codecInfo ->
+                CodecCard(codec = codecInfo, modifier = Modifier.padding(8.dp))
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExposedDropdownMenuBoxScope.MenuItemComboboxField(selectedValue: String, isExpanded: Boolean) {
+    TextField(
+        value = selectedValue,
+        onValueChange = {},
+        readOnly = true,
+        trailingIcon = {
+            ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded)
+        },
+        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+        modifier = Modifier
+            .menuAnchor()
+            .size(width = 160.dp, height = Dp.Unspecified)
+    )
+}
+
+@Composable
+fun CodecCard(codec: MediaCodecInfo, modifier: Modifier = Modifier) {
+    val supportedTypes = codec.supportedTypes
+    val typeSuffix = if (supportedTypes.size > 1) " (+${supportedTypes.size})" else ""
+    Card {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+        ) {
+            Column {
+                Text(text = codec.name, style = MaterialTheme.typography.titleMedium)
+                Text(text = "Type: " + supportedTypes.first() + typeSuffix)
+            }
+            HardwareCodecIndicator(codec)
+        }
+    }
+}
+
+@Composable
+fun HardwareCodecIndicator(codecInfo: MediaCodecInfo) {
+    val label = if (codecInfo.isSoftwareCodec()) "SW" else "HW"
+    val backgroundColor = Color(if (!codecInfo.isSoftwareCodec()) 0xFFEF5350 else 0xFF42A5F5)
+    Box(Modifier.border(2.dp, Color.White, RoundedCornerShape(4.dp))) {
+        Text(
+            text = label,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(2.dp)
+                .background(backgroundColor)
+        )
     }
 }
 
