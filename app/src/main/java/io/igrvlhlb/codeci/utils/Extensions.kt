@@ -4,6 +4,8 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.os.Build
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
 
 /*
 Function MediaCodecList.isSoftwareCodec() obtained from
@@ -38,3 +40,6 @@ fun MediaCodecInfo.isSoftwareCodec(): Boolean {
         !isHardwareAccelerated || isSoftwareOnly
     }
 }
+
+@Composable
+fun Int.intToDp() = with(LocalDensity.current) { this@intToDp.toDp() }

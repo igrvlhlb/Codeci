@@ -1,7 +1,5 @@
 package io.igrvlhlb.codeci
 
-import android.media.MediaCodecInfo
-import android.media.MediaCodecList
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,7 +30,6 @@ import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -43,7 +41,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -55,6 +55,7 @@ import io.igrvlhlb.codeci.model.CodecType
 import io.igrvlhlb.codeci.model.HWAccel
 import io.igrvlhlb.codeci.model.MediaType
 import io.igrvlhlb.codeci.ui.theme.CodeciTheme
+import io.igrvlhlb.codeci.utils.minAspectRatio
 
 class MainActivity : ComponentActivity() {
 
@@ -94,7 +95,7 @@ fun MainUi(viewModel: CodecsViewModel, innerPadding: PaddingValues = PaddingValu
             .padding(innerPadding)
             .fillMaxSize()) {
         FilterMenu(viewModel)
-        CodecsList(viewModel)
+        CodecsList(viewModel, Modifier.padding(top = 8.dp))
     }
 }
 
@@ -155,7 +156,7 @@ fun FilterMenuItem(
 
 @Composable
 fun FilterMenuItemTitle(text: String) {
-    Text(text = text, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+    Text(text = text, style = MaterialTheme.typography.titleMedium)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -186,16 +187,21 @@ fun FilterMenuComboBox(
 }
 
 @Composable
-fun CodecsList(viewModel: CodecsViewModel) {
+fun CodecsList(viewModel: CodecsViewModel, modifier: Modifier = Modifier) {
     val state by viewModel.state
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+    Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxSize()) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.wrapContentSize()
         ) {
             items(state.codecsList) { codecInfo ->
-                CodecCard(codec = codecInfo, modifier = Modifier.padding(8.dp))
+                CodecCard(
+                    codecInfo.name,
+                    codecInfo.supportedTypes.toList(),
+                    codecInfo.isSoftwareCodec(),
+                    modifier = Modifier.padding(12.dp)
+                )
             }
         }
     }
@@ -219,37 +225,69 @@ fun ExposedDropdownMenuBoxScope.MenuItemComboboxField(selectedValue: String, isE
 }
 
 @Composable
-fun CodecCard(codec: MediaCodecInfo, modifier: Modifier = Modifier) {
-    val supportedTypes = codec.supportedTypes
+fun CodecCard(
+    codecName: String,
+    supportedTypes: List<String>,
+    isSoftwareCodec: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val supportedTypes = supportedTypes
     val typeSuffix = if (supportedTypes.size > 1) " (+${supportedTypes.size})" else ""
     Card {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
         ) {
             Column {
-                Text(text = codec.name, style = MaterialTheme.typography.titleMedium)
+                Text(text = codecName, style = MaterialTheme.typography.titleSmall)
                 Text(text = "Type: " + supportedTypes.first() + typeSuffix)
             }
-            HardwareCodecIndicator(codec)
+            HardwareCodecIndicator(isSoftwareCodec)
         }
     }
 }
 
 @Composable
-fun HardwareCodecIndicator(codecInfo: MediaCodecInfo) {
-    val label = if (codecInfo.isSoftwareCodec()) "SW" else "HW"
-    val backgroundColor = Color(if (!codecInfo.isSoftwareCodec()) 0xFFEF5350 else 0xFF42A5F5)
-    Box(Modifier.border(2.dp, Color.White, RoundedCornerShape(4.dp))) {
+fun HardwareCodecIndicator(isSoftwareCodec: Boolean) {
+    val label = if (isSoftwareCodec) "SW" else "HW"
+    val backgroundColor = Color(if (!isSoftwareCodec) 0xFFEF5350 else 0xFF42A5F5)
+    val shape = RoundedCornerShape(4.dp)
+
+    Box(
+        modifier = Modifier
+            .border(2.dp, Color.White, shape)
+            .clip(shape)
+            .background(backgroundColor)
+            .wrapContentSize()
+            .minAspectRatio(1.0),
+        contentAlignment = Alignment.Center
+    ) {
         Text(
             text = label,
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .padding(2.dp)
-                .background(backgroundColor)
+            fontSize = 8.sp,
         )
+    }
+}
+
+@Preview
+@Composable
+fun CodecCardPreview() {
+    CodecCard(
+        codecName = "OMX.google.h264.encoder",
+        supportedTypes = listOf("video/avc"),
+        isSoftwareCodec = false,
+        modifier = Modifier.padding(16.dp)
+    )
+}
+
+@Composable
+@Preview
+fun HardwareCodecIndicatorPreview() {
+    Box(modifier = Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+        HardwareCodecIndicator(isSoftwareCodec = true)
     }
 }
 
@@ -260,4 +298,3 @@ fun MainPreview() {
         MainUi(viewModel = CodecsViewModel())
     }
 }
-
