@@ -1,5 +1,6 @@
 package io.igrvlhlb.codeci
 
+import android.graphics.text.LineBreaker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,16 +14,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -42,9 +47,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.LinearGradientShader
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -193,14 +203,16 @@ fun CodecsList(viewModel: CodecsViewModel, modifier: Modifier = Modifier) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.wrapContentSize()
+            modifier = Modifier.fillMaxHeight()
         ) {
             items(state.codecsList) { codecInfo ->
                 CodecCard(
                     codecInfo.name,
                     codecInfo.supportedTypes.toList(),
                     codecInfo.isSoftwareCodec(),
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .width(260.dp)
                 )
             }
         }
@@ -231,22 +243,38 @@ fun CodecCard(
     isSoftwareCodec: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val supportedTypes = supportedTypes
     val typeSuffix = if (supportedTypes.size > 1) " (+${supportedTypes.size})" else ""
-    Card {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier
-        ) {
-            Column {
-                Text(text = codecName, style = MaterialTheme.typography.titleSmall)
-                Text(text = "Type: " + supportedTypes.first() + typeSuffix)
+    val gradient = Brush.horizontalGradient(0f to MaterialTheme.colorScheme.surface, 1f to MaterialTheme.colorScheme.primaryContainer)
+
+    Card(elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
+        Box(Modifier.background(gradient).then(modifier)) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column {
+                    Text(text = codecName, style = MaterialTheme.typography.titleMedium/*.copy(lineBreak = customLineBreak)*/, overflow = TextOverflow.Ellipsis)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            text = "Type: " + supportedTypes.first() + typeSuffix,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        HardwareCodecIndicator(isSoftwareCodec)
+                    }
+                }
             }
-            HardwareCodecIndicator(isSoftwareCodec)
         }
     }
 }
+
+val customLineBreak = LineBreak(
+    strategy = LineBreak.Strategy.HighQuality,
+    strictness = LineBreak.Strictness.Strict,
+    wordBreak = LineBreak.WordBreak.Phrase
+)
 
 @Composable
 fun HardwareCodecIndicator(isSoftwareCodec: Boolean) {
