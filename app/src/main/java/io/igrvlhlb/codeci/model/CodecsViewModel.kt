@@ -28,6 +28,8 @@ class CodecsViewModel : ViewModel() {
     val state: State<UIState>
         get() = _state
 
+    lateinit var selectedCodec: MediaCodecInfo
+
     init {
         getCodecsInfos()
         updateState(UIState.default())
