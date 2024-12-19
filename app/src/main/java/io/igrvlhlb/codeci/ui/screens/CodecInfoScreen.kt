@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
@@ -28,7 +27,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.codeci.ui.main.CodecsViewModel
 import com.example.codeci.utils.isSoftwareCodec
-import io.igrvlhlb.codeci.utils.CodecConstantsMapper
 import io.igrvlhlb.codeci.utils.CodecConstantsMapper.colorFormatToString
 import io.igrvlhlb.codeci.utils.CodecConstantsMapper.profileLevelToString
 
@@ -157,10 +155,6 @@ fun GeneralCodecCapabilitiesView(capabilities: MediaCodecInfo.CodecCapabilities)
                 }
             }
         }
-        Text(
-            text = "Max Supported Instances: ${capabilities.maxSupportedInstances}",
-            style = MaterialTheme.typography.bodyMedium
-        )
         Row (modifier = Modifier.fillMaxWidth()) {
             val profileLevels = capabilities.profileLevels.map { profileLevelToString(capabilities.mimeType, it) }
             Text(
@@ -180,6 +174,10 @@ fun GeneralCodecCapabilitiesView(capabilities: MediaCodecInfo.CodecCapabilities)
                 }
             }
         }
+        Text(
+            text = "Max Supported Instances: ${capabilities.maxSupportedInstances}",
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -188,11 +186,11 @@ fun AudioCodecCapabilitiesView(capabilities: MediaCodecInfo.AudioCapabilities) {
     InfoSection("Audio Capabilities") {
         Text(text = "Bitrate Range: ${capabilities.bitrateRange}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Max Input Channel Count: ${capabilities.maxInputChannelCount}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Supported Sample Rates: ${capabilities.supportedSampleRates}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Supported Sample Rate Ranges: ${capabilities.supportedSampleRateRanges}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Supported Sample Rates: ${capabilities.supportedSampleRates.toList()}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Supported Sample Rate Ranges: ${capabilities.supportedSampleRateRanges.map { it.lower to it.upper } }}", style = MaterialTheme.typography.bodyMedium)
         if (Build.VERSION.SDK_INT >= 31) {
             Text(text = "Min Input Channel Count: ${capabilities.minInputChannelCount}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Input Channel Count Ranges: ${capabilities.inputChannelCountRanges}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Input Channel Count Ranges: ${capabilities.inputChannelCountRanges.map { it.lower to it.upper }}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
