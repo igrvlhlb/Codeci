@@ -208,59 +208,59 @@ object CodecConstantsMapper {
     }
 
     fun profileLevelToString(mimeType: String, profileLevel: CodecProfileLevel): Pair<String, String> {
-        val fn: (CodecProfileLevel) -> Pair<String, String> = when (mimeType) {
-            MIMETYPE_VIDEO_VP8 -> ::getVP8ProfileLevel
-            MIMETYPE_VIDEO_VP9 -> ::getVP9ProfileLevel
-            MIMETYPE_VIDEO_AV1 -> ::getAV1ProfileLevel
-            MIMETYPE_VIDEO_AVC -> ::getAVCProfileLevel
-            MIMETYPE_VIDEO_HEVC -> ::getHEVCProfileLevel
-            MIMETYPE_VIDEO_MPEG4 -> ::getMPEG4ProfileLevel
-            MIMETYPE_VIDEO_H263 -> ::getH263ProfileLevel
-            MIMETYPE_VIDEO_MPEG2 -> ::getMPEG2ProfileLevel
-            MIMETYPE_VIDEO_DOLBY_VISION -> ::getDOLBY_VISIONProfileLevel
-            MIMETYPE_AUDIO_AAC -> ::getAACProfileLevel
-            MIMETYPE_AUDIO_AC4 -> ::getAC4ProfileLevel
-            MIMETYPE_AUDIO_DTS_HD -> ::getDTS_HDProfileLevel
-            MIMETYPE_AUDIO_DTS_UHD -> ::getDTS_UHDProfileLevel
-            MIMETYPE_AUDIO_AAC_ELD,
-            MIMETYPE_AUDIO_AAC_HE_V1,
-            MIMETYPE_AUDIO_AAC_HE_V2,
-            MIMETYPE_AUDIO_AAC_LC,
-            MIMETYPE_AUDIO_AAC_XHE,
-            MIMETYPE_AUDIO_AC3,
-            MIMETYPE_AUDIO_AMR_NB,
-            MIMETYPE_AUDIO_AMR_WB,
-            MIMETYPE_AUDIO_DOLBY_MAT,
-            MIMETYPE_AUDIO_DOLBY_TRUEHD,
-            MIMETYPE_AUDIO_DRA,
-            MIMETYPE_AUDIO_DTS,
-            MIMETYPE_AUDIO_EAC3,
-            MIMETYPE_AUDIO_EAC3_JOC,
-            MIMETYPE_AUDIO_FLAC,
-            MIMETYPE_AUDIO_G711_ALAW,
-            MIMETYPE_AUDIO_G711_MLAW,
-            MIMETYPE_AUDIO_IEC61937,
-            MIMETYPE_AUDIO_MPEG,
-            MIMETYPE_AUDIO_MPEGH_BL_L3,
-            MIMETYPE_AUDIO_MPEGH_BL_L4,
-            MIMETYPE_AUDIO_MPEGH_LC_L3,
-            MIMETYPE_AUDIO_MPEGH_LC_L4,
-            MIMETYPE_AUDIO_MPEGH_MHA1,
-            MIMETYPE_AUDIO_MPEGH_MHM1,
-            MIMETYPE_AUDIO_MSGSM,
-            MIMETYPE_AUDIO_OPUS,
-            MIMETYPE_AUDIO_QCELP,
-            MIMETYPE_AUDIO_RAW,
-            MIMETYPE_AUDIO_SCRAMBLED,
-            MIMETYPE_AUDIO_VORBIS,
-            MIMETYPE_IMAGE_ANDROID_HEIC,
-            MIMETYPE_IMAGE_AVIF,
-            MIMETYPE_TEXT_CEA_608,
-            MIMETYPE_TEXT_CEA_708,
-            MIMETYPE_TEXT_SUBRIP,
-            MIMETYPE_TEXT_VTT,
-            MIMETYPE_VIDEO_RAW,
-            MIMETYPE_VIDEO_SCRAMBLED -> ::undefinedProfileLevel
+        val fn: (CodecProfileLevel) -> Pair<String, String> = when (mimeType.getCodecSuffix()) {
+            MIMETYPE_VIDEO_VP8.getCodecSuffix() -> ::getVP8ProfileLevel
+            MIMETYPE_VIDEO_VP9.getCodecSuffix() -> ::getVP9ProfileLevel
+            MIMETYPE_VIDEO_AV1.getCodecSuffix() -> ::getAV1ProfileLevel
+            MIMETYPE_VIDEO_AVC.getCodecSuffix() -> ::getAVCProfileLevel
+            MIMETYPE_VIDEO_HEVC.getCodecSuffix() -> ::getHEVCProfileLevel
+            MIMETYPE_VIDEO_MPEG4.getCodecSuffix() -> ::getMPEG4ProfileLevel
+            MIMETYPE_VIDEO_H263.getCodecSuffix() -> ::getH263ProfileLevel
+            MIMETYPE_VIDEO_MPEG2.getCodecSuffix() -> ::getMPEG2ProfileLevel
+            MIMETYPE_VIDEO_DOLBY_VISION.getCodecSuffix() -> ::getDOLBY_VISIONProfileLevel
+            MIMETYPE_AUDIO_AAC.getCodecSuffix() -> ::getAACProfileLevel
+            MIMETYPE_AUDIO_AC4.getCodecSuffix() -> ::getAC4ProfileLevel
+            MIMETYPE_AUDIO_DTS_HD.getCodecSuffix() -> ::getDTS_HDProfileLevel
+            MIMETYPE_AUDIO_DTS_UHD.getCodecSuffix() -> ::getDTS_UHDProfileLevel
+            MIMETYPE_AUDIO_AAC_ELD.getCodecSuffix(),
+            MIMETYPE_AUDIO_AAC_HE_V1.getCodecSuffix(),
+            MIMETYPE_AUDIO_AAC_HE_V2.getCodecSuffix(),
+            MIMETYPE_AUDIO_AAC_LC.getCodecSuffix(),
+            MIMETYPE_AUDIO_AAC_XHE.getCodecSuffix(),
+            MIMETYPE_AUDIO_AC3.getCodecSuffix(),
+            MIMETYPE_AUDIO_AMR_NB.getCodecSuffix(),
+            MIMETYPE_AUDIO_AMR_WB.getCodecSuffix(),
+            MIMETYPE_AUDIO_DOLBY_MAT.getCodecSuffix(),
+            MIMETYPE_AUDIO_DOLBY_TRUEHD.getCodecSuffix(),
+            MIMETYPE_AUDIO_DRA.getCodecSuffix(),
+            MIMETYPE_AUDIO_DTS.getCodecSuffix(),
+            MIMETYPE_AUDIO_EAC3.getCodecSuffix(),
+            MIMETYPE_AUDIO_EAC3_JOC.getCodecSuffix(),
+            MIMETYPE_AUDIO_FLAC.getCodecSuffix(),
+            MIMETYPE_AUDIO_G711_ALAW.getCodecSuffix(),
+            MIMETYPE_AUDIO_G711_MLAW.getCodecSuffix(),
+            MIMETYPE_AUDIO_IEC61937.getCodecSuffix(),
+            MIMETYPE_AUDIO_MPEG.getCodecSuffix(),
+            MIMETYPE_AUDIO_MPEGH_BL_L3.getCodecSuffix(),
+            MIMETYPE_AUDIO_MPEGH_BL_L4.getCodecSuffix(),
+            MIMETYPE_AUDIO_MPEGH_LC_L3.getCodecSuffix(),
+            MIMETYPE_AUDIO_MPEGH_LC_L4.getCodecSuffix(),
+            MIMETYPE_AUDIO_MPEGH_MHA1.getCodecSuffix(),
+            MIMETYPE_AUDIO_MPEGH_MHM1.getCodecSuffix(),
+            MIMETYPE_AUDIO_MSGSM.getCodecSuffix(),
+            MIMETYPE_AUDIO_OPUS.getCodecSuffix(),
+            MIMETYPE_AUDIO_QCELP.getCodecSuffix(),
+            MIMETYPE_AUDIO_RAW.getCodecSuffix(),
+            MIMETYPE_AUDIO_SCRAMBLED.getCodecSuffix(),
+            MIMETYPE_AUDIO_VORBIS.getCodecSuffix(),
+            MIMETYPE_IMAGE_ANDROID_HEIC.getCodecSuffix(),
+            MIMETYPE_IMAGE_AVIF.getCodecSuffix(),
+            MIMETYPE_TEXT_CEA_608.getCodecSuffix(),
+            MIMETYPE_TEXT_CEA_708.getCodecSuffix(),
+            MIMETYPE_TEXT_SUBRIP.getCodecSuffix(),
+            MIMETYPE_TEXT_VTT.getCodecSuffix(),
+            MIMETYPE_VIDEO_RAW.getCodecSuffix(),
+            MIMETYPE_VIDEO_SCRAMBLED.getCodecSuffix() -> ::undefinedProfileLevel
             else -> { _ -> "?" to "?" }
         }
         return fn(profileLevel)
@@ -622,5 +622,7 @@ object CodecConstantsMapper {
     }
 
     fun undefinedProfileLevel(profileLevel: MediaCodecInfo.CodecProfileLevel) = "-" to "-"
+
+    private fun String.getCodecSuffix() = split('/').last()
 }
 
