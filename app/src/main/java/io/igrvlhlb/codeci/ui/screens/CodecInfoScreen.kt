@@ -186,8 +186,8 @@ fun AudioCodecCapabilitiesView(capabilities: MediaCodecInfo.AudioCapabilities) {
     InfoSection("Audio Capabilities") {
         Text(text = "Bitrate Range: ${capabilities.bitrateRange}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Max Input Channel Count: ${capabilities.maxInputChannelCount}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Supported Sample Rates: ${capabilities.supportedSampleRates.toList()}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Supported Sample Rate Ranges: ${capabilities.supportedSampleRateRanges.map { it.lower to it.upper } }}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Supported Sample Rates: ${capabilities.supportedSampleRates?.toList() ?: "-"}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Supported Sample Rate Ranges: ${capabilities.supportedSampleRateRanges?.map { it.lower to it.upper } ?: "-"}}", style = MaterialTheme.typography.bodyMedium)
         if (Build.VERSION.SDK_INT >= 31) {
             Text(text = "Min Input Channel Count: ${capabilities.minInputChannelCount}", style = MaterialTheme.typography.bodyMedium)
             Text(text = "Input Channel Count Ranges: ${capabilities.inputChannelCountRanges.map { it.lower to it.upper }}", style = MaterialTheme.typography.bodyMedium)
@@ -205,7 +205,7 @@ fun VideoCodecCapabilitiesView(capabilities: MediaCodecInfo.VideoCapabilities) {
         Text(text = "Width Alignment: ${capabilities.widthAlignment}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Height Alignment: ${capabilities.heightAlignment}", style = MaterialTheme.typography.bodyMedium)
         if (Build.VERSION.SDK_INT >= 29) {
-            Text(text = "Supported Performance Points: ${capabilities.supportedPerformancePoints}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Supported Performance Points: ${capabilities.supportedPerformancePoints?.toList() ?: "-"}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
