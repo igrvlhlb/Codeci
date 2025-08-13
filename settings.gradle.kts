@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Codec(i)"
 include(":app")
- 
+include(":lib")

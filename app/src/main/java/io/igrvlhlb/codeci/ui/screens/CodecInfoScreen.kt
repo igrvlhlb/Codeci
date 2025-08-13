@@ -26,14 +26,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.codeci.ui.main.CodecsViewModel
-import com.example.codeci.utils.isSoftwareCodec
-import io.igrvlhlb.codeci.utils.CodecConstantsMapper.colorFormatToString
-import io.igrvlhlb.codeci.utils.CodecConstantsMapper.profileLevelToString
+import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
+import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
+import io.igrvlhlb.lib.data.formatter.CodecInfoFormatter
+import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.colorFormatToString
+import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.profileLevelToString
 
 @Composable
 fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
     val codec = viewModel.selectedCodec
     val scrollState = rememberScrollState()
+    println(CodecInfoFormatter.formatCodecInfo(CodecInfoExtractor().extractCodecInfo(codec)))
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier

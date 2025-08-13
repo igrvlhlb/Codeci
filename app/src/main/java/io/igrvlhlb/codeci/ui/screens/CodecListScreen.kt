@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.codeci.ui.main.CodecsViewModel
-import com.example.codeci.utils.isSoftwareCodec
+import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
 import io.igrvlhlb.codeci.model.CodecType
 import io.igrvlhlb.codeci.model.HWAccel
 import io.igrvlhlb.codeci.model.MediaType
