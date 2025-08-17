@@ -1,4 +1,4 @@
-package io.igrvlhlb.codeci.utils
+package io.igrvlhlb.codeci.ui.composables
 
 import androidx.annotation.FloatRange
 import androidx.compose.runtime.Composable

@@ -55,7 +55,7 @@ import io.igrvlhlb.codeci.model.CodecType
 import io.igrvlhlb.codeci.model.HWAccel
 import io.igrvlhlb.codeci.model.MediaType
 import io.igrvlhlb.codeci.ui.theme.CodeciTheme
-import io.igrvlhlb.codeci.utils.minAspectRatio
+import io.igrvlhlb.codeci.ui.composables.minAspectRatio
 
 @Composable
 fun CodecListScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues = PaddingValues(), navController: NavHostController) {
