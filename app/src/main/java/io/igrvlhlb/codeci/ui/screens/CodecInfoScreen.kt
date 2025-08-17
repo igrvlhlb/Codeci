@@ -29,6 +29,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.codeci.ui.main.CodecsViewModel
+import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
 import io.igrvlhlb.lib.codeci.utils.ifZeroThen
 import io.igrvlhlb.lib.data.AudioCapabilitiesInfo
 import io.igrvlhlb.lib.data.BitrateMode
@@ -134,7 +135,7 @@ fun GeneralCodecCapabilitiesView(capabilities: CodecCapabilitiesInfo) {
             )
             if (colorFormats.isNotEmpty()) {
                 Spacer(Modifier.size(16.dp))
-                LazyColumn(Modifier.sizeIn(maxHeight = 48.dp)) {
+                VerticalLazyListScrollBar (scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp)) {
                     items(colorFormats) { colorFormat ->
                         Text(
                             text = colorFormat,
@@ -197,10 +198,12 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
         Text(text = "Supported Performance Points: ${capabilities.supportedPerformancePoints?.toList() ?: "-"}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Max Supported Frame Rates:", style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.size(16.dp))
-        LazyColumn(Modifier.sizeIn(maxHeight = 48.dp)) {
+        VerticalLazyListScrollBar(
+            scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp)
+        ) {
             items(capabilities.maxSupportedFrameRates) { pp ->
                 Text(
-                    text = "${pp.resolution} @ ${pp.frameRates.upper.ifZeroThen { "Not supported" }} fps",
+                    text = "${pp.width}x${pp.height}: ${pp.frameRates.upper} fps",
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(start = 8.dp)
                 )
@@ -208,7 +211,9 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
         }
         Text(text = "Achievable Frame Rates:", style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.size(16.dp))
-        LazyColumn(Modifier.sizeIn(maxHeight = 48.dp)) {
+        VerticalLazyListScrollBar(
+            scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp),
+        ) {
             items(capabilities.achievableFrameRates.filter { it.frameRates.upper > 0.0 }) { pp ->
                 Text(
                     text = pp.toString(),
