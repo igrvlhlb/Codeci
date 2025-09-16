@@ -1,11 +1,20 @@
 package io.igrvlhlb.codeci.ui.composables
 
 import androidx.annotation.FloatRange
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun WrappingSquareLayout(
@@ -86,3 +95,21 @@ fun Modifier.minAspectRatio(
 //        )
 //    }
 //}
+
+@Composable
+fun RoundingFrame(
+    modifier: Modifier = Modifier,
+    borderWidth: Dp = 1.dp,
+    color: Color = MaterialTheme.colorScheme.primary,
+    shape: CornerBasedShape = MaterialTheme.shapes.medium,
+    content: @Composable () -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .border(borderWidth, color, shape)
+            .clip(shape)
+    ) {
+        content()
+    }
+}

@@ -2,9 +2,9 @@ package io.igrvlhlb.codeci.ui.screens
 
 import android.media.MediaCodecList
 import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,11 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,8 +29,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.codeci.ui.main.CodecsViewModel
+import io.igrvlhlb.codeci.ui.composables.RoundingFrame
 import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
-import io.igrvlhlb.lib.codeci.utils.ifZeroThen
+import io.igrvlhlb.lib.codeci.utils.roundTo
 import io.igrvlhlb.lib.data.AudioCapabilitiesInfo
 import io.igrvlhlb.lib.data.BitrateMode
 import io.igrvlhlb.lib.data.CodecCapabilitiesInfo
@@ -38,8 +39,6 @@ import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
 import io.igrvlhlb.lib.data.formatter.CodecInfoFormatter
-import my.nanihadesuka.compose.LazyColumnScrollbar
-import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
 fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
@@ -135,13 +134,18 @@ fun GeneralCodecCapabilitiesView(capabilities: CodecCapabilitiesInfo) {
             )
             if (colorFormats.isNotEmpty()) {
                 Spacer(Modifier.size(16.dp))
-                VerticalLazyListScrollBar (scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp)) {
-                    items(colorFormats) { colorFormat ->
-                        Text(
-                            text = colorFormat,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+                RoundingFrame(
+                    modifier = Modifier.padding(4.dp).sizeIn(maxHeight = 48.dp),
+                    shape = RoundedCornerShape(0.dp)
+                ) {
+                    VerticalLazyListScrollBar (scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp)) {
+                        items(colorFormats) { colorFormat ->
+                            Text(
+                                text = colorFormat,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -154,13 +158,20 @@ fun GeneralCodecCapabilitiesView(capabilities: CodecCapabilitiesInfo) {
             )
             if (profileLevels.isNotEmpty()) {
                 Spacer(Modifier.size(16.dp))
-                LazyColumn(Modifier.sizeIn(maxHeight = 48.dp)) {
-                    items(profileLevels) { profileLevel ->
-                        Text(
-                            text = profileLevel.toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+                RoundingFrame(
+                    modifier = Modifier.padding(4.dp).sizeIn(maxHeight = 48.dp),
+                    shape = RoundedCornerShape(0.dp)
+                ) {
+                    VerticalLazyListScrollBar(
+                        scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp)
+                    ) {
+                        items(profileLevels) { profileLevel ->
+                            Text(
+                                text = profileLevel.toString(),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -197,29 +208,47 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
         Text(text = "Height Alignment: ${capabilities.heightAlignment}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Supported Performance Points: ${capabilities.supportedPerformancePoints?.toList() ?: "-"}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Max Supported Frame Rates:", style = MaterialTheme.typography.bodyMedium)
-        Spacer(Modifier.size(16.dp))
-        VerticalLazyListScrollBar(
-            scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp)
+        RoundingFrame(
+            modifier = Modifier.padding(4.dp),
+            shape = RoundedCornerShape(0.dp)
         ) {
-            items(capabilities.maxSupportedFrameRates) { pp ->
-                Text(
-                    text = "${pp.width}x${pp.height}: ${pp.frameRates.upper} fps",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+            VerticalLazyListScrollBar(
+                scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp)
+            ) {
+                items(capabilities.maxSupportedFrameRates) { pp ->
+                    Text(
+                        text = "${pp.width}x${pp.height}: ${pp.frameRates.upper.roundTo(2)} fps",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
             }
         }
         Text(text = "Achievable Frame Rates:", style = MaterialTheme.typography.bodyMedium)
-        Spacer(Modifier.size(16.dp))
-        VerticalLazyListScrollBar(
-            scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp),
-        ) {
-            items(capabilities.achievableFrameRates.filter { it.frameRates.upper > 0.0 }) { pp ->
-                Text(
-                    text = pp.toString(),
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
+        val validAchievableFrameRates = capabilities.achievableFrameRates.filter { it.frameRates.upper > 0.0 }
+        if (validAchievableFrameRates.isEmpty()) {
+            Text(
+                text = "—",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        } else {
+            RoundingFrame(
+                modifier = Modifier.padding(4.dp),
+                shape = RoundedCornerShape(0.dp)
+            ) {
+                VerticalLazyListScrollBar(
+                    scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp),
+                ) {
+                    items(validAchievableFrameRates) { pp ->
+                        Log.d("CodecInfoScreen", "Achievable PP: $pp")
+                        Text(
+                            text = pp.toString(),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
             }
         }
     }
