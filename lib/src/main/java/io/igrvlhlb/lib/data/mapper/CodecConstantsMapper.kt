@@ -2,67 +2,11 @@ package io.igrvlhlb.lib.data.mapper
 
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
+import io.igrvlhlb.lib.data.ColorFormat
 
 object CodecConstantsMapper {
     fun colorFormatToString(format: Int): String {
-        return when (format) {
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatMonochrome -> "Monochrome"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format8bitRGB332 -> "8bitRGB332"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format12bitRGB444 -> "12bitRGB444"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format16bitARGB4444 -> "16bitARGB4444"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format16bitARGB1555 -> "16bitARGB1555"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format16bitRGB565 -> "16bitRGB565"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format16bitBGR565 -> "16bitBGR565"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format18bitRGB666 -> "18bitRGB666"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format18bitARGB1665 -> "18bitARGB1665"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format19bitARGB1666 -> "19bitARGB1666"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format24bitRGB888 -> "24bitRGB888"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format24bitBGR888 -> "24bitBGR888"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format24bitARGB1887 -> "24bitARGB1887"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format25bitARGB1888 -> "25bitARGB1888"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format32bitBGRA8888 -> "32bitBGRA8888"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format32bitARGB8888 -> "32bitARGB8888"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV411Planar -> "YUV411Planar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV411PackedPlanar -> "YUV411PackedPlanar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar -> "YUV420Planar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar -> "YUV420PackedPlanar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar -> "YUV420SemiPlanar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422Planar -> "YUV422Planar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422PackedPlanar -> "YUV422PackedPlanar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422SemiPlanar -> "YUV422SemiPlanar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYCbYCr -> "YCbYCr"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYCrYCb -> "YCrYCb"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatCbYCrY -> "CbYCrY"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatCrYCbY -> "CrYCbY"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV444Interleaved -> "YUV444Interleaved"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer8bit -> "RawBayer8bit"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer10bit -> "RawBayer10bit"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer8bitcompressed -> "RawBayer8bitcompressed"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatL2 -> "L2"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatL4 -> "L4"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatL8 -> "L8"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatL16 -> "L16"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatL24 -> "L24"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatL32 -> "L32"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar -> "YUV420PackedSemiPlanar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422PackedSemiPlanar -> "YUV422PackedSemiPlanar"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format18BitBGR666 -> "18BitBGR666"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format24BitARGB6666 -> "24BitARGB6666"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format24BitABGR6666 -> "24BitABGR6666"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUVP010 -> "YUVP010"
-            MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar -> "TI_YUV420PackedSemiPlanar"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface -> "Surface"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format64bitABGRFloat -> "64bitABGRFloat"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format32bitABGR8888 -> "32bitABGR8888"
-            MediaCodecInfo.CodecCapabilities.COLOR_Format32bitABGR2101010 -> "32bitABGR2101010"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible -> "YUV420Flexible"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422Flexible -> "YUV422Flexible"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV444Flexible -> "YUV444Flexible"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatRGBFlexible -> "RGBFlexible"
-            MediaCodecInfo.CodecCapabilities.COLOR_FormatRGBAFlexible -> "RGBAFlexible"
-            MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar -> "QCOM_YUV420SemiPlanar"
-            else -> "Unknown"
-        }
+        return ColorFormat.from(format)?.formatName ?: "Unknown"
     }
 
     fun profileLevelToString(mimeType: String, profileLevel: MediaCodecInfo.CodecProfileLevel): Pair<String, String> {
@@ -125,7 +69,10 @@ object CodecConstantsMapper {
     }
 
     private fun getVP8ProfileLevel(profileLevel: MediaCodecInfo.CodecProfileLevel): Pair<String, String> {
-        val profile = "VP8ProfileMain"
+        val profile = when (profileLevel.profile) {
+            MediaCodecInfo.CodecProfileLevel.VP8ProfileMain -> "VP8ProfileMain"
+            else -> "?"
+        }
         val level = when (profileLevel.level) {
             MediaCodecInfo.CodecProfileLevel.VP8Level_Version0 -> "0"
             MediaCodecInfo.CodecProfileLevel.VP8Level_Version1 -> "1"
