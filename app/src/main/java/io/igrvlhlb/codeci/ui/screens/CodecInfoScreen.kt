@@ -1,10 +1,12 @@
 package io.igrvlhlb.codeci.ui.screens
 
-import android.media.MediaCodecInfo
 import android.media.MediaCodecList
 import android.os.Build
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,25 +17,41 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.codeci.ui.main.CodecsViewModel
-import com.example.codeci.utils.isSoftwareCodec
-import io.igrvlhlb.codeci.utils.CodecConstantsMapper.colorFormatToString
-import io.igrvlhlb.codeci.utils.CodecConstantsMapper.profileLevelToString
+import io.igrvlhlb.codeci.ui.composables.RoundingFrame
+import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
+import io.igrvlhlb.lib.codeci.utils.roundTo
+import io.igrvlhlb.lib.data.AudioCapabilitiesInfo
+import io.igrvlhlb.lib.data.BitrateMode
+import io.igrvlhlb.lib.data.CodecCapabilitiesInfo
+import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
+import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
+import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
+import io.igrvlhlb.lib.data.formatter.CodecInfoFormatter
 
 @Composable
 fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
-    val codec = viewModel.selectedCodec
+    val codec = viewModel.codecInfo
     val scrollState = rememberScrollState()
+    println(CodecInfoFormatter.formatCodecInfo(codec))
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
@@ -44,40 +62,25 @@ fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
     ) {
         InfoSection("Codec Info") {
             Text(text = "Name: ${codec.name}", style = MaterialTheme.typography.bodyMedium)
+            SafeText("Supported Types", codec.supportedTypes.joinToString())
             Text(
-                text = "Supported Types: ${codec.supportedTypes?.joinToString()}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Is Software Codec: ${codec.isSoftwareCodec()}",
+                text = "Is Software Codec: ${codec.isSoftwareCodec}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
                 text = "Is Encoder: ${codec.isEncoder}",
                 style = MaterialTheme.typography.bodyMedium
             )
-            if (Build.VERSION.SDK_INT >= 29) {
-                Text(
-                    text = "Is Hardware Accelerated: ${codec.isHardwareAccelerated}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Canonical Name: ${codec.canonicalName}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Is Software Only: ${codec.isSoftwareOnly}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Is Vendor: ${codec.isVendor}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            SafeText("Is Hardware Accelerated", codec.basicInfo.isHardwareAccelerated?.toString())
+            SafeText("Canonical Name", codec.basicInfo.canonicalName)
+            SafeText("Is Software Only", codec.basicInfo.isSoftwareOnly?.toString())
+            SafeText("Is Vendor", codec.basicInfo.isVendor?.toString())
+
         }
-        codec.supportedTypes.map {
+
+        codec.capabilities.forEach {
             CodecCapabilitiesView(
-                codec.getCapabilitiesForType(it),
+                it,
                 codec.isEncoder
             )
         }
@@ -107,26 +110,20 @@ fun InfoSection(
 }
 
 @Composable
-fun CodecCapabilitiesView(capabilities: MediaCodecInfo.CodecCapabilities, isEncoder: Boolean) {
+fun CodecCapabilitiesView(capabilities: CodecCapabilitiesInfo, isEncoder: Boolean) {
     InfoSection("Capabilities (${capabilities.mimeType})") {
         GeneralCodecCapabilitiesView(capabilities)
         val audioCapabilities = capabilities.audioCapabilities
         val videoCapabilities = capabilities.videoCapabilities
         val encoderCapabilities = capabilities.encoderCapabilities
-        if (audioCapabilities != null) {
-            AudioCodecCapabilitiesView(capabilities.audioCapabilities)
-        }
-        if (videoCapabilities != null) {
-            VideoCodecCapabilitiesView(capabilities.videoCapabilities)
-        }
-        if (encoderCapabilities != null) {
-            EncoderCodecCapabilitiesView(capabilities.encoderCapabilities)
-        }
+        audioCapabilities?.let{ AudioCodecCapabilitiesView(it) }
+        videoCapabilities?.let { VideoCodecCapabilitiesView(it) }
+        encoderCapabilities?.let{ EncoderCodecCapabilitiesView(it) }
     }
 }
 
 @Composable
-fun GeneralCodecCapabilitiesView(capabilities: MediaCodecInfo.CodecCapabilities) {
+fun GeneralCodecCapabilitiesView(capabilities: CodecCapabilitiesInfo) {
     InfoSection("General Capabilities") {
         Text(
             text = "Mime Type: ${capabilities.mimeType}",
@@ -137,39 +134,75 @@ fun GeneralCodecCapabilitiesView(capabilities: MediaCodecInfo.CodecCapabilities)
             style = MaterialTheme.typography.bodyMedium
         )
         Row (modifier = Modifier.fillMaxWidth()) {
-            val colorFormats = capabilities.colorFormats.map { colorFormatToString(it) }
+            val colorFormats = capabilities.colorFormats
             Text(
                 text = "Color Formats:${if (colorFormats.isEmpty()) " -" else ""}",
                 style = MaterialTheme.typography.bodyMedium
             )
             if (colorFormats.isNotEmpty()) {
                 Spacer(Modifier.size(16.dp))
-                LazyColumn(Modifier.sizeIn(maxHeight = 48.dp)) {
-                    items(colorFormats) { colorFormat ->
-                        Text(
-                            text = colorFormat,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+                RoundingFrame(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .sizeIn(maxHeight = 48.dp),
+                    shape = RoundedCornerShape(0.dp),
+                ) {
+                    VerticalLazyListScrollBar (
+                        scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp),
+                        contentPadding = PaddingValues(vertical = 4.dp)
+                    ) {
+                        itemsIndexed(colorFormats) { i, colorFormat ->
+                            Text(
+                                text = colorFormat,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                            if (i < colorFormats.size - 1) {
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .padding(vertical = 2.dp)
+                                        .width(12.dp),
+                                    thickness = 1.dp
+                                )
+                            }
+                        }
                     }
                 }
             }
         }
         Row (modifier = Modifier.fillMaxWidth()) {
-            val profileLevels = capabilities.profileLevels.map { profileLevelToString(capabilities.mimeType, it) }
+            val profileLevels = capabilities.profileLevels
             Text(
                 text = "Profile Levels: ${if (profileLevels.isEmpty()) " -" else ""}",
                 style = MaterialTheme.typography.bodyMedium
             )
             if (profileLevels.isNotEmpty()) {
                 Spacer(Modifier.size(16.dp))
-                LazyColumn(Modifier.sizeIn(maxHeight = 48.dp)) {
-                    items(profileLevels) { profileLevel ->
-                        Text(
-                            text = profileLevel.toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+                RoundingFrame(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .sizeIn(maxHeight = 48.dp),
+                    shape = RoundedCornerShape(0.dp)
+                ) {
+                    VerticalLazyListScrollBar(
+                        scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp),
+                        contentPadding = PaddingValues(vertical = 4.dp)
+                    ) {
+                        itemsIndexed(profileLevels) { i, profileLevel ->
+                            Text(
+                                text = profileLevel.toString(),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                            if (i < profileLevels.size - 1) {
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .padding(vertical = 2.dp)
+                                        .width(12.dp),
+                                    thickness = 1.dp
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -182,55 +215,116 @@ fun GeneralCodecCapabilitiesView(capabilities: MediaCodecInfo.CodecCapabilities)
 }
 
 @Composable
-fun AudioCodecCapabilitiesView(capabilities: MediaCodecInfo.AudioCapabilities) {
+fun AudioCodecCapabilitiesView(capabilities: AudioCapabilitiesInfo) {
     InfoSection("Audio Capabilities") {
         Text(text = "Bitrate Range: ${capabilities.bitrateRange}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Max Input Channel Count: ${capabilities.maxInputChannelCount}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Supported Sample Rates: ${capabilities.supportedSampleRates?.toList() ?: "-"}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Supported Sample Rate Ranges: ${capabilities.supportedSampleRateRanges?.map { it.lower to it.upper } ?: "-"}}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Supported Sample Rate Ranges: ${capabilities.supportedSampleRateRanges ?: "-"}}", style = MaterialTheme.typography.bodyMedium)
         if (Build.VERSION.SDK_INT >= 31) {
-            Text(text = "Min Input Channel Count: ${capabilities.minInputChannelCount}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Input Channel Count Ranges: ${capabilities.inputChannelCountRanges.map { it.lower to it.upper }}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Min Input Channel Count: ${capabilities.minInputChannelCount ?: "-"}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Input Channel Count Ranges: ${capabilities.inputChannelCountRanges ?: "-"}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
 
 @Composable
-fun VideoCodecCapabilitiesView(capabilities: MediaCodecInfo.VideoCapabilities) {
+fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
     InfoSection("Video Capabilities") {
         Text(text = "Bitrate Range: ${capabilities.bitrateRange}", style = MaterialTheme.typography.bodyMedium)
-        Text(text = "Frame Rates: ${capabilities.supportedFrameRates}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Frame Rates: ${capabilities.supportedFrameRates ?: "-"}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Width Range: ${capabilities.supportedWidths}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Height Range: ${capabilities.supportedHeights}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Width Alignment: ${capabilities.widthAlignment}", style = MaterialTheme.typography.bodyMedium)
         Text(text = "Height Alignment: ${capabilities.heightAlignment}", style = MaterialTheme.typography.bodyMedium)
-        if (Build.VERSION.SDK_INT >= 29) {
-            Text(text = "Supported Performance Points: ${capabilities.supportedPerformancePoints?.toList() ?: "-"}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Supported Performance Points: ${capabilities.supportedPerformancePoints?.toList() ?: "-"}", style = MaterialTheme.typography.bodyMedium)
+        Text(text = "Max Supported Frame Rates:", style = MaterialTheme.typography.bodyMedium)
+        RoundingFrame(
+            modifier = Modifier.padding(4.dp),
+            shape = RoundedCornerShape(0.dp)
+        ) {
+            VerticalLazyListScrollBar(
+                scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp),
+                contentPadding = PaddingValues(vertical = 4.dp)
+            ) {
+                itemsIndexed(capabilities.maxSupportedFrameRates) { i, pp ->
+                    Text(
+                        text = "${pp.width}x${pp.height}: ${pp.frameRates.upper.roundTo(2)} fps",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    if (i < capabilities.maxSupportedFrameRates.size - 1) {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .padding(vertical = 2.dp)
+                                .width(12.dp),
+                            thickness = 1.dp
+                        )
+                    }
+                }
+            }
+        }
+        Text(text = "Achievable Frame Rates:", style = MaterialTheme.typography.bodyMedium)
+        val validAchievableFrameRates = capabilities.achievableFrameRates.filter { it.frameRates.upper > 0.0 }
+        if (validAchievableFrameRates.isEmpty()) {
+            Text(
+                text = "—",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        } else {
+            RoundingFrame(
+                modifier = Modifier.padding(4.dp),
+                shape = RoundedCornerShape(0.dp)
+            ) {
+                VerticalLazyListScrollBar(
+                    scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp),
+                    contentPadding = PaddingValues(vertical = 4.dp)
+                ) {
+                    itemsIndexed(validAchievableFrameRates) { i, pp ->
+                        Log.d("CodecInfoScreen", "Achievable PP: $pp")
+                        Text(
+                            text = pp.toString(),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                        if (i < validAchievableFrameRates.size - 1) {
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .padding(vertical = 2.dp)
+                                    .width(12.dp),
+                                thickness = 1.dp
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
-fun EncoderCodecCapabilitiesView(capabilities: MediaCodecInfo.EncoderCapabilities) {
-    val modes = mutableMapOf("Constant (CBR)" to MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR,
-        "Constant Quality (CQ)" to MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CQ,
-        "Variable (VBR)" to MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR
+fun EncoderCodecCapabilitiesView(capabilities: EncoderCapabilitiesInfo) {
+    val modesStrs = mapOf(
+        BitrateMode.CBR to "Constant (CBR)",
+        BitrateMode.CQ to "Constant Quality (CQ)",
+        BitrateMode.VBR to "Variable (VBR)",
+        BitrateMode.CBR_FD to "Constant with Frame Drops (CBR_FD)"
     )
-    if (Build.VERSION.SDK_INT >= 31) {
-        modes["Constant with Frame Drops (CBR_FD)"] = MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR_FD
-    }
-
     InfoSection("Encoder Capabilities") {
         if (Build.VERSION.SDK_INT >= 29) {
             Text(text = "Quality Range: ${capabilities.qualityRange}", style = MaterialTheme.typography.bodyMedium)
         }
         Text(text = "Complexity Range: ${capabilities.complexityRange}", style = MaterialTheme.typography.bodyMedium)
         Text("Bitrate Modes", style = MaterialTheme.typography.titleSmall)
-        modes.forEach { (label, mode) ->
-            Text(
-                text = "$label: ${capabilities.isBitrateModeSupported(mode)}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+        capabilities.isBitrateModeSupported.map { (mode, value) ->
+            val modeStr = modesStrs.getOrDefault(mode, null)
+            modeStr?.let {
+                Text(
+                    text = "${modeStr}: $value",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -248,5 +342,16 @@ fun CodecInfoScreenPreview() {
 fun VideoCapabilities() {
     val codecs = MediaCodecList(MediaCodecList.ALL_CODECS).codecInfos
     val videoCodec = codecs.find { codec -> codec.supportedTypes.any { type -> type.startsWith("video/") } }
-    VideoCodecCapabilitiesView(videoCodec!!.getCapabilitiesForType(videoCodec!!.supportedTypes[0]).videoCapabilities)
+//    VideoCodecCapabilitiesView(videoCodec!!.getCapabilitiesForType(videoCodec!!.supportedTypes[0]).videoCapabilities)
+    videoCodec?.let {
+        val codecInfo = CodecInfoExtractor().extractCodecInfo(it)
+        VideoCodecCapabilitiesView(codecInfo.capabilities.first { it.videoCapabilities != null }.videoCapabilities!!)
+    }
+}
+
+@Composable
+fun SafeText(name: String, value: String?, typography: TextStyle = MaterialTheme.typography.bodyMedium) {
+    if (!value.isNullOrEmpty()) {
+        Text(text = "$name: $value", style = MaterialTheme.typography.bodyMedium)
+    }
 }

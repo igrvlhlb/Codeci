@@ -7,12 +7,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.example.codeci.utils.isSoftwareCodec
 import io.igrvlhlb.codeci.model.CodecType
 import io.igrvlhlb.codeci.model.HWAccel
 import io.igrvlhlb.codeci.model.MediaType
 import io.igrvlhlb.codeci.model.UIState
+import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
+import io.igrvlhlb.lib.data.CodecInfo
+import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
 
 class CodecsViewModel : ViewModel() {
 
@@ -29,6 +30,9 @@ class CodecsViewModel : ViewModel() {
         get() = _state
 
     lateinit var selectedCodec: MediaCodecInfo
+
+    val codecInfo: CodecInfo
+        get() = CodecInfoExtractor().extractCodecInfo(selectedCodec)
 
     init {
         getCodecsInfos()

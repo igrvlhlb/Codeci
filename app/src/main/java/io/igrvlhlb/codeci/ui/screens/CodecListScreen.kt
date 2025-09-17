@@ -50,12 +50,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.codeci.ui.main.CodecsViewModel
-import com.example.codeci.utils.isSoftwareCodec
+import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
 import io.igrvlhlb.codeci.model.CodecType
 import io.igrvlhlb.codeci.model.HWAccel
 import io.igrvlhlb.codeci.model.MediaType
+import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
 import io.igrvlhlb.codeci.ui.theme.CodeciTheme
-import io.igrvlhlb.codeci.utils.minAspectRatio
+import io.igrvlhlb.codeci.ui.composables.minAspectRatio
+import my.nanihadesuka.compose.LazyColumnScrollbar
 
 @Composable
 fun CodecListScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues = PaddingValues(), navController: NavHostController) {
@@ -164,10 +166,12 @@ fun CodecsList(
 ) {
     val state by viewModel.state
     Box(contentAlignment = Alignment.Center, modifier = modifier.fillMaxSize()) {
-        LazyColumn(
+        VerticalLazyListScrollBar (
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxHeight()
+            scrollBarModifier = Modifier.fillMaxHeight().padding(8.dp),
+            lazyColumnModifier = Modifier
+                .fillMaxSize()
         ) {
             items(state.codecsList) { codecInfo ->
                 ClickableCodecCard(
