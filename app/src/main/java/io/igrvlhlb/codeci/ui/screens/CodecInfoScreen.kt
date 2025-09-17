@@ -3,38 +3,44 @@ package io.igrvlhlb.codeci.ui.screens
 import android.media.MediaCodecList
 import android.os.Build
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.HorizontalAlignmentLine
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.example.codeci.ui.main.CodecsViewModel
 import io.igrvlhlb.codeci.ui.composables.RoundingFrame
 import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
@@ -264,7 +270,65 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
                 }
             }
         }
-        Text(text = "Achievable Frame Rates:", style = MaterialTheme.typography.bodyMedium)
+        Row(Modifier.height(IntrinsicSize.Min)) {
+            val openDialog = remember { mutableStateOf(false) }
+            val dialogWidth = 300.dp
+            val dialogHeight = 200.dp
+
+            Text(
+                text = "Achievable Frame Rates:",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.align(Alignment.CenterVertically),
+            )
+            Spacer(Modifier.width(8.dp))
+            Image(
+                imageVector = Icons.Filled.Info,
+                contentDescription = "About Achievable Frame Rates",
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
+                modifier = Modifier
+                    .size(18.dp)
+                    .align(Alignment.CenterVertically)
+                    .clickable(true, onClick = {
+                        openDialog.value = true
+                    })
+            )
+            if (openDialog.value) {
+                val dialogScrollState = rememberScrollState()
+                Dialog(onDismissRequest = { openDialog.value = false }) {
+                    RoundingFrame(
+                        Modifier
+                            .size(dialogWidth, dialogHeight)
+//                            .background(
+//                                MaterialTheme.colorScheme.primaryContainer
+//
+//                            )
+                    ) {
+                        Box(Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .verticalScroll(dialogScrollState)
+                        ) {
+                            Text(
+                                text = "Achievable frame rates represent the range of frame " +
+                                        "rates a codec can reach for a specific video size, based on " +
+                                        "manufacturer performance tests. On Android M (API 23), the " +
+                                        "values reflect the highest rates measured, not guaranteed " +
+                                        "or average performance. From Android N (API 24) onward, " +
+                                        "the range estimates sustained performance: you can expect " +
+                                        "rates above the lower limit more than half the time, and " +
+                                        "above half that limit in 90% of cases. Results are for a " +
+                                        "single active codec and may decrease with multiple codecs " +
+                                        "or due to device conditions like battery and temperature. " +
+                                        "Use this info only to compare codecs on the same device.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(16.dp)
+
+                            )
+                        }
+                    }
+                }
+            }
+        }
         val validAchievableFrameRates = capabilities.achievableFrameRates.filter { it.frameRates.upper > 0.0 }
         if (validAchievableFrameRates.isEmpty()) {
             Text(
