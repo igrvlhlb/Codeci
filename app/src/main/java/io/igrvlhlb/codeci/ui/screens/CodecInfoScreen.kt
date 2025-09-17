@@ -3,8 +3,10 @@ package io.igrvlhlb.codeci.ui.screens
 import android.media.MediaCodecList
 import android.os.Build
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,13 +20,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -135,16 +142,29 @@ fun GeneralCodecCapabilitiesView(capabilities: CodecCapabilitiesInfo) {
             if (colorFormats.isNotEmpty()) {
                 Spacer(Modifier.size(16.dp))
                 RoundingFrame(
-                    modifier = Modifier.padding(4.dp).sizeIn(maxHeight = 48.dp),
-                    shape = RoundedCornerShape(0.dp)
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .sizeIn(maxHeight = 48.dp),
+                    shape = RoundedCornerShape(0.dp),
                 ) {
-                    VerticalLazyListScrollBar (scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp)) {
-                        items(colorFormats) { colorFormat ->
+                    VerticalLazyListScrollBar (
+                        scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp),
+                        contentPadding = PaddingValues(vertical = 4.dp)
+                    ) {
+                        itemsIndexed(colorFormats) { i, colorFormat ->
                             Text(
                                 text = colorFormat,
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 8.dp)
                             )
+                            if (i < colorFormats.size - 1) {
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .padding(vertical = 2.dp)
+                                        .width(12.dp),
+                                    thickness = 1.dp
+                                )
+                            }
                         }
                     }
                 }
@@ -159,18 +179,29 @@ fun GeneralCodecCapabilitiesView(capabilities: CodecCapabilitiesInfo) {
             if (profileLevels.isNotEmpty()) {
                 Spacer(Modifier.size(16.dp))
                 RoundingFrame(
-                    modifier = Modifier.padding(4.dp).sizeIn(maxHeight = 48.dp),
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .sizeIn(maxHeight = 48.dp),
                     shape = RoundedCornerShape(0.dp)
                 ) {
                     VerticalLazyListScrollBar(
-                        scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp)
+                        scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp),
+                        contentPadding = PaddingValues(vertical = 4.dp)
                     ) {
-                        items(profileLevels) { profileLevel ->
+                        itemsIndexed(profileLevels) { i, profileLevel ->
                             Text(
                                 text = profileLevel.toString(),
                                 style = MaterialTheme.typography.bodySmall,
                                 modifier = Modifier.padding(start = 8.dp)
                             )
+                            if (i < profileLevels.size - 1) {
+                                HorizontalDivider(
+                                    modifier = Modifier
+                                        .padding(vertical = 2.dp)
+                                        .width(12.dp),
+                                    thickness = 1.dp
+                                )
+                            }
                         }
                     }
                 }
@@ -213,14 +244,23 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
             shape = RoundedCornerShape(0.dp)
         ) {
             VerticalLazyListScrollBar(
-                scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp)
+                scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp),
+                contentPadding = PaddingValues(vertical = 4.dp)
             ) {
-                items(capabilities.maxSupportedFrameRates) { pp ->
+                itemsIndexed(capabilities.maxSupportedFrameRates) { i, pp ->
                     Text(
                         text = "${pp.width}x${pp.height}: ${pp.frameRates.upper.roundTo(2)} fps",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 8.dp)
                     )
+                    if (i < capabilities.maxSupportedFrameRates.size - 1) {
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .padding(vertical = 2.dp)
+                                .width(12.dp),
+                            thickness = 1.dp
+                        )
+                    }
                 }
             }
         }
@@ -239,14 +279,23 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
             ) {
                 VerticalLazyListScrollBar(
                     scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp),
+                    contentPadding = PaddingValues(vertical = 4.dp)
                 ) {
-                    items(validAchievableFrameRates) { pp ->
+                    itemsIndexed(validAchievableFrameRates) { i, pp ->
                         Log.d("CodecInfoScreen", "Achievable PP: $pp")
                         Text(
                             text = pp.toString(),
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(start = 8.dp)
                         )
+                        if (i < validAchievableFrameRates.size - 1) {
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .padding(vertical = 2.dp)
+                                    .width(12.dp),
+                                thickness = 1.dp
+                            )
+                        }
                     }
                 }
             }
