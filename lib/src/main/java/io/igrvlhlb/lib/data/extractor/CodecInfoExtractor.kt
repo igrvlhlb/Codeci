@@ -15,6 +15,7 @@ import io.igrvlhlb.lib.data.PerformancePoint
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.colorFormatToString
 import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.profileLevelToString
+import io.igrvlhlb.lib.utils.fragile
 
 /**
  * Service responsible for extracting and structuring codec information from MediaCodecInfo
@@ -90,7 +91,8 @@ class CodecInfoExtractor {
             AudioCapabilitiesInfo(
                 bitrateRange = audio.bitrateRange,
                 maxInputChannelCount = audio.maxInputChannelCount,
-                supportedSampleRates = audio.supportedSampleRates?.toList(),
+                // Uses a fragile block to safely handle potential crashes observed on API 24
+                supportedSampleRates =  fragile { audio.supportedSampleRates }?.toList(),
                 supportedSampleRateRanges = audio.supportedSampleRateRanges?.map {
                     it.lower to it.upper
                 },
