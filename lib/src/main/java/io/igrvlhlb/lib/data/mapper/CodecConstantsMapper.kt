@@ -77,7 +77,15 @@ object CodecConstantsMapper {
     }
 
     fun profileLevelToString(mimeType: String, profileLevel: MediaCodecInfo.CodecProfileLevel): Pair<String, String> {
-        val profileLevelString = CodecProfileLevel.entries.find { it.mimeType == mimeType }?.profileLevel?.getProfileLevel(profileLevel)
+        val profileLevelString = with(CodecProfileLevel.entries) {
+            // Must be two searches because mime type suffixes may be equal.
+            // I.e: "video/raw" would match "audio/raw".
+            // The second search is a fallback in case the first one fails. Some codecs have mime types differ on prefix.
+            // I.e: Samsung Galaxy S24 (Exynos) has "wfd/hevc"
+            val codecProfileLevel = find { it.mimeType == mimeType }
+                ?: find { it.mimeType.getCodecSuffix() == mimeType.getCodecSuffix() }
+            codecProfileLevel?.profileLevel?.getProfileLevel(profileLevel)
+        }
         return profileLevelString ?: ("?" to "?")
     }
 }
@@ -160,6 +168,8 @@ interface ProfileLevelMapper {
         return getProfileLevel(profileLevel.profile, profileLevel.level)
     }
 }
+
+private fun String.getCodecSuffix() = split('/').last()
 
 @ChecksSdkIntAtLeast(parameter = 0, lambda = 1)
 fun <T: Any>sdkAtLeastOrElse(sdkInt: Int, otherwise: T, value: () -> T): T =
