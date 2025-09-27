@@ -1,8 +1,13 @@
 package io.igrvlhlb.lib.data
 
+import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR
+import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR_FD
+import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CQ
+import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR
 import android.media.MediaFormat
 import android.util.Range
 import io.igrvlhlb.lib.codeci.utils.roundTo
+import io.igrvlhlb.lib.utils.sdkAtLeast
 
 /**
  * Structured representation of codec information extracted from MediaCodecInfo
@@ -81,10 +86,10 @@ data class EncoderCapabilitiesInfo(
  * Bitrate modes for encoders
  */
 enum class BitrateMode(val value: Int) {
-    CQ(0),
-    VBR(1),
-    CBR(2),
-    CBR_FD(3)
+    CQ(BITRATE_MODE_CQ),
+    VBR(BITRATE_MODE_VBR),
+    CBR(BITRATE_MODE_CBR),
+    CBR_FD(if (sdkAtLeast(31)) BITRATE_MODE_CBR_FD else -1)
 }
 
 data class Resolution(val width: Int, val height: Int)
