@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -58,6 +59,7 @@ import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
 import io.igrvlhlb.codeci.ui.theme.CodeciTheme
 import io.igrvlhlb.codeci.ui.composables.minAspectRatio
 import my.nanihadesuka.compose.LazyColumnScrollbar
+import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
 fun CodecListScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues = PaddingValues(), navController: NavHostController) {
@@ -169,9 +171,15 @@ fun CodecsList(
         VerticalLazyListScrollBar (
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            scrollBarModifier = Modifier.fillMaxHeight().padding(8.dp),
+            scrollBarModifier = Modifier
+                .fillMaxHeight()
+                .padding(8.dp),
             lazyColumnModifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+            settings = ScrollbarSettings.Default.copy(
+                thumbUnselectedColor = MaterialTheme.colorScheme.primary,
+                thumbSelectedColor = MaterialTheme.colorScheme.secondary
+            )
         ) {
             items(state.codecsList) { codecInfo ->
                 ClickableCodecCard(

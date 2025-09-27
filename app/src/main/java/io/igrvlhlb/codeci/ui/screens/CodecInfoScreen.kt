@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -52,6 +51,7 @@ import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
 import io.igrvlhlb.lib.data.formatter.CodecInfoFormatter
+import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
 fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
@@ -155,7 +155,11 @@ fun GeneralCodecCapabilitiesView(capabilities: CodecCapabilitiesInfo) {
                 ) {
                     VerticalLazyListScrollBar (
                         scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp),
-                        contentPadding = PaddingValues(vertical = 4.dp)
+                        contentPadding = PaddingValues(vertical = 4.dp),
+                        settings = ScrollbarSettings.Default.copy(
+                            thumbUnselectedColor = MaterialTheme.colorScheme.primary,
+                            thumbSelectedColor = MaterialTheme.colorScheme.primary,
+                        )
                     ) {
                         itemsIndexed(colorFormats) { i, colorFormat ->
                             Text(
@@ -192,7 +196,11 @@ fun GeneralCodecCapabilitiesView(capabilities: CodecCapabilitiesInfo) {
                 ) {
                     VerticalLazyListScrollBar(
                         scrollBarModifier = Modifier.sizeIn(maxHeight = 48.dp),
-                        contentPadding = PaddingValues(vertical = 4.dp)
+                        contentPadding = PaddingValues(vertical = 4.dp),
+                        settings = ScrollbarSettings.Default.copy(
+                            thumbUnselectedColor = MaterialTheme.colorScheme.primary,
+                            thumbSelectedColor = MaterialTheme.colorScheme.primary,
+                        ),
                     ) {
                         itemsIndexed(profileLevels) { i, profileLevel ->
                             Text(
@@ -251,7 +259,11 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
         ) {
             VerticalLazyListScrollBar(
                 scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp),
-                contentPadding = PaddingValues(vertical = 4.dp)
+                contentPadding = PaddingValues(vertical = 4.dp),
+                settings = ScrollbarSettings.Default.copy(
+                    thumbUnselectedColor = MaterialTheme.colorScheme.primary,
+                    thumbSelectedColor = MaterialTheme.colorScheme.primary,
+                ),
             ) {
                 itemsIndexed(capabilities.maxSupportedFrameRates) { i, pp ->
                     Text(
@@ -343,7 +355,11 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
             ) {
                 VerticalLazyListScrollBar(
                     scrollBarModifier = Modifier.sizeIn(maxHeight = 64.dp),
-                    contentPadding = PaddingValues(vertical = 4.dp)
+                    contentPadding = PaddingValues(vertical = 4.dp),
+                    settings = ScrollbarSettings.Default.copy(
+                        thumbUnselectedColor = MaterialTheme.colorScheme.primary,
+                        thumbSelectedColor = MaterialTheme.colorScheme.secondary,
+                    ),
                 ) {
                     itemsIndexed(validAchievableFrameRates) { i, pp ->
                         Log.d("CodecInfoScreen", "Achievable PP: $pp")
