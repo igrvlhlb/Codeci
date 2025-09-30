@@ -62,7 +62,9 @@ enum class ColorFormat(val value: Int) {
     COLOR_FormatYUV444Flexible(MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV444Flexible),
     COLOR_FormatRGBFlexible(MediaCodecInfo.CodecCapabilities.COLOR_FormatRGBFlexible),
     COLOR_FormatRGBAFlexible(MediaCodecInfo.CodecCapabilities.COLOR_FormatRGBAFlexible),
-    COLOR_QCOM_FormatYUV420SemiPlanar(MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar);
+    COLOR_QCOM_FormatYUV420SemiPlanar(MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar),
+    @RequiresApi(Build.VERSION_CODES.BAKLAVA)
+    COLOR_FormatYUVP210(MediaCodecInfo.CodecCapabilities.COLOR_FormatYUVP210);
 
     val formatName get() = this.name.substring(12)
 

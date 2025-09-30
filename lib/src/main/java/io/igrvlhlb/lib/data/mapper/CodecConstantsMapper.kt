@@ -22,6 +22,7 @@ import android.media.MediaFormat.MIMETYPE_AUDIO_EAC3_JOC
 import android.media.MediaFormat.MIMETYPE_AUDIO_FLAC
 import android.media.MediaFormat.MIMETYPE_AUDIO_G711_ALAW
 import android.media.MediaFormat.MIMETYPE_AUDIO_G711_MLAW
+import android.media.MediaFormat.MIMETYPE_AUDIO_IAMF
 import android.media.MediaFormat.MIMETYPE_AUDIO_IEC61937
 import android.media.MediaFormat.MIMETYPE_AUDIO_MPEG
 import android.media.MediaFormat.MIMETYPE_AUDIO_MPEGH_BL_L3
@@ -42,6 +43,7 @@ import android.media.MediaFormat.MIMETYPE_TEXT_CEA_608
 import android.media.MediaFormat.MIMETYPE_TEXT_CEA_708
 import android.media.MediaFormat.MIMETYPE_TEXT_SUBRIP
 import android.media.MediaFormat.MIMETYPE_TEXT_VTT
+import android.media.MediaFormat.MIMETYPE_VIDEO_APV
 import android.media.MediaFormat.MIMETYPE_VIDEO_AV1
 import android.media.MediaFormat.MIMETYPE_VIDEO_AVC
 import android.media.MediaFormat.MIMETYPE_VIDEO_DOLBY_VISION
@@ -57,6 +59,7 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import io.igrvlhlb.lib.data.ColorFormat
 import io.igrvlhlb.lib.data.mapper.mimetypes.AACProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.AC4ProfileLevelMapper
+import io.igrvlhlb.lib.data.mapper.mimetypes.APVProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.AV1ProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.AVCProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.DTS_HDProfileLevelMapper
@@ -64,6 +67,7 @@ import io.igrvlhlb.lib.data.mapper.mimetypes.DTS_UHDProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.DolbyVisionProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.H263ProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.HEVCProfileLevelMapper
+import io.igrvlhlb.lib.data.mapper.mimetypes.IAMFProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.MPEG2ProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.MPEG4ProfileLevelMapper
 import io.igrvlhlb.lib.data.mapper.mimetypes.PlaceholderProfileLevelMapper
@@ -143,6 +147,8 @@ enum class CodecProfileLevel(val mimeType: String, val profileLevel: ProfileLeve
     VTT(MIMETYPE_TEXT_VTT, PlaceholderProfileLevelMapper),
     VIDEO_RAW(MIMETYPE_VIDEO_RAW, PlaceholderProfileLevelMapper),
     VIDEO_SCRAMBLED(sdkAtLeastMimeType(26) { MIMETYPE_VIDEO_SCRAMBLED }, PlaceholderProfileLevelMapper),
+    VPA(sdkAtLeastMimeType(36) { MIMETYPE_VIDEO_APV }, APVProfileLevelMapper),
+    IAMF(sdkAtLeastMimeType(36) { MIMETYPE_AUDIO_IAMF }, IAMFProfileLevelMapper),
 }
 
 

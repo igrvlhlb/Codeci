@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "io.igrvlhlb.lib"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24
