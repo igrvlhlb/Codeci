@@ -1,17 +1,24 @@
 package io.igrvlhlb.lib.data
 
+import android.annotation.SuppressLint
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR_FD
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CQ
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR
-import android.util.Range
 import io.igrvlhlb.lib.codeci.utils.roundTo
 import io.igrvlhlb.lib.data.mapper.MediaFormat
 import io.igrvlhlb.lib.utils.sdkAtLeast
+import kotlinx.serialization.SerialInfo
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
 
 /**
  * Structured representation of codec information extracted from MediaCodecInfo
  */
+@Serializable
 data class CodecInfo(
     val name: String,
     val supportedTypes: List<String>,
@@ -19,11 +26,14 @@ data class CodecInfo(
     val isEncoder: Boolean,
     val basicInfo: BasicCodecInfo,
     val capabilities: List<CodecCapabilitiesInfo>
-)
+) {
+    fun serialize(): String = Json.encodeToString(this)
+}
 
 /**
  * Basic codec information available on all Android versions
  */
+@Serializable
 data class BasicCodecInfo(
     val canonicalName: String?,
     val isHardwareAccelerated: Boolean?,
@@ -34,6 +44,7 @@ data class BasicCodecInfo(
 /**
  * Information about codec capabilities for a specific MIME type
  */
+@Serializable
 data class CodecCapabilitiesInfo(
     val supportedType: String,
     val mimeType: String,
@@ -49,23 +60,25 @@ data class CodecCapabilitiesInfo(
 /**
  * Audio-specific codec capabilities
  */
+@Serializable
 data class AudioCapabilitiesInfo(
-    val bitrateRange: Range<Int>,
+    val bitrateRange: ValueRange<Int>,
     val maxInputChannelCount: Int,
     val supportedSampleRates: List<Int>?,
-    val supportedSampleRateRanges: List<Pair<Int, Int>>?,
+    val supportedSampleRateRanges: List<ValueRange<Int>>?,
     val minInputChannelCount: Int?,
-    val inputChannelCountRanges: List<Pair<Int, Int>>?
+    val inputChannelCountRanges: List<ValueRange<Int>>?
 )
 
 /**
  * Video-specific codec capabilities
  */
+@Serializable
 data class VideoCapabilitiesInfo(
-    val bitrateRange: Range<Int>,
-    val supportedFrameRates: Range<Int>?,
-    val supportedHeights: Range<Int>,
-    val supportedWidths: Range<Int>,
+    val bitrateRange: ValueRange<Int>,
+    val supportedFrameRates: ValueRange<Int>?,
+    val supportedHeights: ValueRange<Int>,
+    val supportedWidths: ValueRange<Int>,
     val widthAlignment: Int,
     val heightAlignment: Int,
     val maxSupportedFrameRates: List<PerformancePoint>,
@@ -76,9 +89,10 @@ data class VideoCapabilitiesInfo(
 /**
  * Encoder-specific capabilities
  */
+@Serializable
 data class EncoderCapabilitiesInfo(
-    val complexityRange: Range<Int>?,
-    val qualityRange: Range<Int>?,
+    val complexityRange: ValueRange<Int>?,
+    val qualityRange: ValueRange<Int>?,
     val isBitrateModeSupported: Map<BitrateMode, Boolean>
 )
 
@@ -94,9 +108,10 @@ enum class BitrateMode(val value: Int) {
 
 data class Resolution(val width: Int, val height: Int)
 
-data class PerformancePoint(val width: Int, val height: Int, val frameRates: Range<Double>) {
+@Serializable
+data class PerformancePoint(val width: Int, val height: Int, val frameRates: ValueRange<Double>) {
 
-    constructor(resolution: Resolution, frameRates: Range<Double>) : this(
+    constructor(resolution: Resolution, frameRates: ValueRange<Double>) : this(
         resolution.width,
         resolution.height,
         frameRates
@@ -126,3 +141,16 @@ enum class CommonResolutions(val resolution: Resolution) {
     R4K(Resolution(3840, 2160)),
     R8K(Resolution(7680, 4320))
 }
+
+
+@Serializable
+data class ValueRange<T: Comparable<T>>(val lower: T, val upper: T) {
+    constructor(range: android.util.Range<T>) : this(range.lower, range.upper)
+    constructor(range: Pair<T, T>) : this(range.first, range.second)
+
+    override fun toString(): String {
+        return "($lower - $upper)"
+    }
+}
+
+fun <T: Comparable<T>>android.util.Range<T>.toValueRange() = ValueRange(this)

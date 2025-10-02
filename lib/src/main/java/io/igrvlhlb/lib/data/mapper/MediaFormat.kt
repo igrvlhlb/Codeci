@@ -1,5 +1,6 @@
 package io.igrvlhlb.lib.data.mapper
 
+import android.annotation.SuppressLint
 import android.media.MediaCodecInfo.CodecCapabilities.FEATURE_AdaptivePlayback
 import android.media.MediaCodecInfo.CodecCapabilities.FEATURE_DetachedSurface
 import android.media.MediaCodecInfo.CodecCapabilities.FEATURE_DynamicColorAspects
@@ -75,8 +76,17 @@ import androidx.annotation.RequiresApi
 import io.igrvlhlb.lib.utils.fragile
 import io.igrvlhlb.lib.utils.sdkAtLeast
 import io.igrvlhlb.lib.utils.sdkAtLeastOrNull
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.serializer
 import java.nio.ByteBuffer
 
+@Serializable(with = MediaFormatSerializer::class)
 class MediaFormat(private val mediaFormat: MediaFormat) {
 
     override fun toString(): String {
@@ -85,7 +95,7 @@ class MediaFormat(private val mediaFormat: MediaFormat) {
         }.joinToString(",", "{", "}")
     }
 
-    private fun getMappings(): Map<String, MediaFormatValue<*>> {
+    fun getMappings(): Map<String, MediaFormatValue<*>> {
         val keys = getKeys()
         val features = getFeatures()
         val mapping = (keys + features).mapNotNull { key ->
@@ -283,3 +293,19 @@ private val FEATURES_MAP = listOfNotNull(
 ).associate { "$FEATURE_PREFIX${it.first}" to it.second }
 
 private const val FEATURE_PREFIX = "feature-"
+
+object MediaFormatSerializer : KSerializer<io.igrvlhlb.lib.data.mapper.MediaFormat> {
+    private val mapSerializer = serializer<Map<String, String>>()
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("MediaFormat")
+    override fun serialize(
+        encoder: Encoder,
+        value: io.igrvlhlb.lib.data.mapper.MediaFormat
+    ) {
+        val data = value.getMappings().mapValues { it.value.toString() }
+        encoder.encodeSerializableValue(mapSerializer, data)
+    }
+
+    override fun deserialize(decoder: Decoder): io.igrvlhlb.lib.data.mapper.MediaFormat {
+        throw UnsupportedOperationException("Deserialization is not supported")
+    }
+}

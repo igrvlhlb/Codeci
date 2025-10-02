@@ -57,7 +57,8 @@ import my.nanihadesuka.compose.ScrollbarSettings
 fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
     val codec = viewModel.codecInfo
     val scrollState = rememberScrollState()
-    println(CodecInfoFormatter.formatCodecInfo(codec))
+//    println(CodecInfoFormatter.formatCodecInfo(codec))
+    println(codec.serialize())
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
