@@ -33,7 +33,9 @@ object CodecInfoFormatter {
             appendLine("Is Encoder: ${codecInfo.isEncoder}")
             appendLine()
 
-            append(formatBasicInfo(codecInfo.basicInfo))
+            codecInfo.basicInfo?.let {
+                append(formatBasicInfo(it))
+            }
             appendLine()
 
             codecInfo.capabilities.forEach { capability ->
@@ -49,10 +51,10 @@ object CodecInfoFormatter {
     fun formatBasicInfo(basicInfo: BasicCodecInfo): String {
         return buildString {
             appendLine("=== BASIC INFO ===")
-            basicInfo.canonicalName?.let { appendLine("Canonical Name: $it") }
-            basicInfo.isHardwareAccelerated?.let { appendLine("Is Hardware Accelerated: $it") }
-            basicInfo.isSoftwareOnly?.let { appendLine("Is Software Only: $it") }
-            basicInfo.isVendor?.let { appendLine("Is Vendor: $it") }
+            basicInfo.canonicalName.let { appendLine("Canonical Name: $it") }
+            basicInfo.isHardwareAccelerated.let { appendLine("Is Hardware Accelerated: $it") }
+            basicInfo.isSoftwareOnly.let { appendLine("Is Software Only: $it") }
+            basicInfo.isVendor.let { appendLine("Is Vendor: $it") }
         }
     }
 

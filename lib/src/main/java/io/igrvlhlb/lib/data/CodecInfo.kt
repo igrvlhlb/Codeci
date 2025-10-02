@@ -1,6 +1,5 @@
 package io.igrvlhlb.lib.data
 
-import android.annotation.SuppressLint
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR_FD
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CQ
@@ -8,11 +7,11 @@ import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR
 import io.igrvlhlb.lib.codeci.utils.roundTo
 import io.igrvlhlb.lib.data.mapper.MediaFormat
 import io.igrvlhlb.lib.utils.sdkAtLeast
-import kotlinx.serialization.SerialInfo
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonConfiguration
 
 
 /**
@@ -24,10 +23,38 @@ data class CodecInfo(
     val supportedTypes: List<String>,
     val isSoftwareCodec: Boolean,
     val isEncoder: Boolean,
-    val basicInfo: BasicCodecInfo,
+    val basicInfo: BasicCodecInfo?,
     val capabilities: List<CodecCapabilitiesInfo>
 ) {
-    fun serialize(): String = Json.encodeToString(this)
+    fun serialize(optPrettyPrint: Boolean = false, optExplicitNulls: Boolean = false): String {
+        return when {
+            optPrettyPrint -> PRETTY_JSON.encodeToString(this)
+            optExplicitNulls -> PLAIN_JSON.encodeToString(this)
+            optPrettyPrint && optExplicitNulls -> {
+                // optExplicitNull don't seem to have effect in this case
+                PRETTY_JSON_EXPLICIT_NULLS.encodeToString(this)
+            }
+            else -> PLAIN_JSON_NO_NULLS.encodeToString(this)
+        }
+    }
+
+    @OptIn(ExperimentalSerializationApi::class)
+    companion object {
+        private val PLAIN_JSON = Json
+        private val PLAIN_JSON_NO_NULLS = Json {
+            explicitNulls = false
+        }
+        private val PRETTY_JSON = Json {
+            prettyPrint = true
+            explicitNulls = false
+            prettyPrintIndent = "\t"
+        }
+        private val PRETTY_JSON_EXPLICIT_NULLS = Json {
+            prettyPrint = true
+            explicitNulls = true
+            prettyPrintIndent = "\t"
+        }
+    }
 }
 
 /**
@@ -35,10 +62,10 @@ data class CodecInfo(
  */
 @Serializable
 data class BasicCodecInfo(
-    val canonicalName: String?,
-    val isHardwareAccelerated: Boolean?,
-    val isSoftwareOnly: Boolean?,
-    val isVendor: Boolean?
+    val canonicalName: String,
+    val isHardwareAccelerated: Boolean,
+    val isSoftwareOnly: Boolean,
+    val isVendor: Boolean
 )
 
 /**

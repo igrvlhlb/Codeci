@@ -57,8 +57,7 @@ import my.nanihadesuka.compose.ScrollbarSettings
 fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
     val codec = viewModel.codecInfo
     val scrollState = rememberScrollState()
-//    println(CodecInfoFormatter.formatCodecInfo(codec))
-    println(codec.serialize())
+    Log.d("CodecInfoScreen", codec.serialize())
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
@@ -78,10 +77,10 @@ fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
                 text = "Is Encoder: ${codec.isEncoder}",
                 style = MaterialTheme.typography.bodyMedium
             )
-            SafeText("Is Hardware Accelerated", codec.basicInfo.isHardwareAccelerated?.toString())
-            SafeText("Canonical Name", codec.basicInfo.canonicalName)
-            SafeText("Is Software Only", codec.basicInfo.isSoftwareOnly?.toString())
-            SafeText("Is Vendor", codec.basicInfo.isVendor?.toString())
+            SafeText("Is Hardware Accelerated", codec.basicInfo?.isHardwareAccelerated?.toString())
+            SafeText("Canonical Name", codec.basicInfo?.canonicalName)
+            SafeText("Is Software Only", codec.basicInfo?.isSoftwareOnly?.toString())
+            SafeText("Is Vendor", codec.basicInfo?.isVendor?.toString())
 
         }
 

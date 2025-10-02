@@ -42,7 +42,7 @@ class CodecInfoExtractor {
     /**
      * Extracts basic codec information with API level compatibility
      */
-    private fun extractBasicInfo(codecInfo: MediaCodecInfo): BasicCodecInfo {
+    private fun extractBasicInfo(codecInfo: MediaCodecInfo): BasicCodecInfo? {
         return if (Build.VERSION.SDK_INT >= 29) {
             BasicCodecInfo(
                 canonicalName = codecInfo.canonicalName,
@@ -51,12 +51,7 @@ class CodecInfoExtractor {
                 isVendor = codecInfo.isVendor
             )
         } else {
-            BasicCodecInfo(
-                canonicalName = null,
-                isHardwareAccelerated = null,
-                isSoftwareOnly = null,
-                isVendor = null
-            )
+            null
         }
     }
 
