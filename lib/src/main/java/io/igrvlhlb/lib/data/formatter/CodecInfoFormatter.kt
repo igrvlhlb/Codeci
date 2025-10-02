@@ -9,6 +9,7 @@ import io.igrvlhlb.lib.data.BasicCodecInfo
 import io.igrvlhlb.lib.data.CodecCapabilitiesInfo
 import io.igrvlhlb.lib.data.CodecInfo
 import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
+import io.igrvlhlb.lib.data.ValueRange
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 
 /**
@@ -186,7 +187,7 @@ object CodecInfoFormatter {
     /**
      * Formats a Range object into a readable string
      */
-    private fun formatRange(range: Range<Int>): String {
+    private fun formatRange(range: ValueRange<Int>): String {
         return "${range.lower} - ${range.upper}"
     }
 

@@ -12,9 +12,12 @@ import io.igrvlhlb.lib.data.CodecInfo
 import io.igrvlhlb.lib.data.CommonResolutions
 import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
 import io.igrvlhlb.lib.data.PerformancePoint
+import io.igrvlhlb.lib.data.ValueRange
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.colorFormatToString
 import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.profileLevelToString
+import io.igrvlhlb.lib.data.mapper.MediaFormat
+import io.igrvlhlb.lib.data.toValueRange
 import io.igrvlhlb.lib.utils.fragile
 
 /**
@@ -66,7 +69,7 @@ class CodecInfoExtractor {
             CodecCapabilitiesInfo(
                 supportedType = mimeType, // is it the same as capabilities.mimeType?
                 mimeType = capabilities.mimeType,
-                defaultFormat = capabilities.defaultFormat,
+                defaultFormat = MediaFormat(capabilities.defaultFormat),
                 colorFormats = capabilities.colorFormats.map { colorFormatToString(it) },
                 profileLevels = capabilities.profileLevels.map {
                     profileLevelToString(capabilities.mimeType, it).let {
@@ -89,18 +92,18 @@ class CodecInfoExtractor {
     ): AudioCapabilitiesInfo? {
         return audioCapabilities?.let { audio ->
             AudioCapabilitiesInfo(
-                bitrateRange = audio.bitrateRange,
+                bitrateRange = audio.bitrateRange.toValueRange(),
                 maxInputChannelCount = audio.maxInputChannelCount,
                 // Uses a fragile block to safely handle potential crashes observed on API 24
                 supportedSampleRates =  fragile { audio.supportedSampleRates }?.toList(),
                 supportedSampleRateRanges = audio.supportedSampleRateRanges?.map {
-                    it.lower to it.upper
+                    ValueRange(it.lower, it.upper)
                 },
                 minInputChannelCount = if (Build.VERSION.SDK_INT >= 31) {
                     audio.minInputChannelCount
                 } else null,
                 inputChannelCountRanges = if (Build.VERSION.SDK_INT >= 31) {
-                    audio.inputChannelCountRanges.map { it.lower to it.upper }
+                    audio.inputChannelCountRanges.map { ValueRange(it.lower, it.upper) }
                 } else null
             )
         }
@@ -114,10 +117,10 @@ class CodecInfoExtractor {
     ): VideoCapabilitiesInfo? {
         return videoCapabilities?.let { capability ->
             VideoCapabilitiesInfo(
-                bitrateRange = capability.bitrateRange,
-                supportedFrameRates = capability.supportedFrameRates,
-                supportedHeights = capability.supportedHeights,
-                supportedWidths = capability.supportedWidths,
+                bitrateRange = capability.bitrateRange.toValueRange(),
+                supportedFrameRates = capability.supportedFrameRates.toValueRange(),
+                supportedHeights = capability.supportedHeights.toValueRange(),
+                supportedWidths = capability.supportedWidths.toValueRange(),
                 widthAlignment = capability.widthAlignment,
                 heightAlignment = capability.heightAlignment,
                 maxSupportedFrameRates = extractMaxSupportedFrameRates(capability),
@@ -146,8 +149,8 @@ class CodecInfoExtractor {
     ): EncoderCapabilitiesInfo? {
         return encoderCapabilities?.let { encoder ->
             EncoderCapabilitiesInfo(
-                complexityRange = encoder.complexityRange,
-                qualityRange = if (Build.VERSION.SDK_INT >= 28) encoder.qualityRange else null,
+                complexityRange = encoder.complexityRange.toValueRange(),
+                qualityRange = if (Build.VERSION.SDK_INT >= 28) encoder.qualityRange.toValueRange() else null,
                 isBitrateModeSupported = mapOf(
                     BitrateMode.CQ to encoder.isBitrateModeSupported(BitrateMode.CQ.value),
                     BitrateMode.VBR to encoder.isBitrateModeSupported(BitrateMode.VBR.value),
@@ -172,7 +175,7 @@ class CodecInfoExtractor {
             } catch (e: Exception) {
                 Range(0.0, 0.0) // Fallback if resolution is not supported
             }
-            PerformancePoint(it.resolution, supportedFrameRate)
+            PerformancePoint(it.resolution, supportedFrameRate.toValueRange())
         }
     }
 
@@ -188,7 +191,7 @@ class CodecInfoExtractor {
             } catch (e: Exception) {
                 Range(0.0, 0.0) // Fallback if resolution is not supported
             }
-            PerformancePoint(commonResolution.resolution, achievableFrameRates)
+            PerformancePoint(commonResolution.resolution, achievableFrameRates.toValueRange())
         }
     }
 }
