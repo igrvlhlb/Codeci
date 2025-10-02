@@ -15,6 +15,7 @@ import io.igrvlhlb.lib.data.PerformancePoint
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.colorFormatToString
 import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.profileLevelToString
+import io.igrvlhlb.lib.data.mapper.MediaFormat
 import io.igrvlhlb.lib.utils.fragile
 
 /**
@@ -66,7 +67,7 @@ class CodecInfoExtractor {
             CodecCapabilitiesInfo(
                 supportedType = mimeType, // is it the same as capabilities.mimeType?
                 mimeType = capabilities.mimeType,
-                defaultFormat = capabilities.defaultFormat,
+                defaultFormat = MediaFormat(capabilities.defaultFormat),
                 colorFormats = capabilities.colorFormats.map { colorFormatToString(it) },
                 profileLevels = capabilities.profileLevels.map {
                     profileLevelToString(capabilities.mimeType, it).let {

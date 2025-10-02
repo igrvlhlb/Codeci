@@ -4,9 +4,9 @@ import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR_FD
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CQ
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR
-import android.media.MediaFormat
 import android.util.Range
 import io.igrvlhlb.lib.codeci.utils.roundTo
+import io.igrvlhlb.lib.data.mapper.MediaFormat
 import io.igrvlhlb.lib.utils.sdkAtLeast
 
 /**
