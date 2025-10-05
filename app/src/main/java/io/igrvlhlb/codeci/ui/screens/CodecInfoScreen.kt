@@ -27,8 +27,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.codeci.ui.main.CodecsViewModel
+import io.igrvlhlb.codeci.TopAppBar
 import io.igrvlhlb.codeci.ui.composables.RoundingFrame
 import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
 import io.igrvlhlb.lib.codeci.utils.roundTo
@@ -50,11 +54,40 @@ import io.igrvlhlb.lib.data.CodecCapabilitiesInfo
 import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
-import io.igrvlhlb.lib.data.formatter.CodecInfoFormatter
 import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
-fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
+fun CodecInfoScreen(viewModel: CodecsViewModel) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                actions = {
+                    androidx.compose.material3.IconButton(onClick = {
+                        val codec = viewModel.codecInfo
+                        val shareText = codec.serialize(optPrettyPrint = true)
+                        val shareIntent = android.content.Intent().apply {
+                            action = android.content.Intent.ACTION_SEND
+                            putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+                            type = "text/json"
+                        }
+                        context.startActivity(android.content.Intent.createChooser(shareIntent, null))
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Share,
+                            contentDescription = "Share"
+                        )
+                    }
+                }
+            )
+        }
+    ) {
+        CodecInfoScreen(viewModel = viewModel, innerPadding = it)
+    }
+}
+
+@Composable
+private fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
     val codec = viewModel.codecInfo
     val scrollState = rememberScrollState()
     Log.d("CodecInfoScreen", codec.serialize())

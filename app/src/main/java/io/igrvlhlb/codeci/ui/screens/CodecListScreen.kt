@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,10 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -29,6 +26,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -51,25 +49,26 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.codeci.ui.main.CodecsViewModel
-import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
 import io.igrvlhlb.codeci.model.CodecType
 import io.igrvlhlb.codeci.model.HWAccel
 import io.igrvlhlb.codeci.model.MediaType
 import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
-import io.igrvlhlb.codeci.ui.theme.CodeciTheme
 import io.igrvlhlb.codeci.ui.composables.minAspectRatio
-import my.nanihadesuka.compose.LazyColumnScrollbar
+import io.igrvlhlb.codeci.ui.theme.CodeciTheme
+import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
 import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
-fun CodecListScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues = PaddingValues(), navController: NavHostController) {
-    Column(
-        Modifier
-            .padding(innerPadding)
-            .fillMaxSize()
-    ) {
-        FilterMenu(viewModel)
-        CodecsList(viewModel, navController, Modifier.padding(top = 8.dp))
+fun CodecListScreen(viewModel: CodecsViewModel, navController: NavHostController) {
+    Scaffold { innerPadding ->
+        Column(
+            Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ) {
+            FilterMenu(viewModel)
+            CodecsList(viewModel, navController, Modifier.padding(top = 8.dp))
+        }
     }
 }
 
@@ -336,7 +335,6 @@ fun MainPreview() {
     CodeciTheme {
         CodecListScreen(
             viewModel = CodecsViewModel(),
-            innerPadding = PaddingValues(16.dp),
             navController = rememberNavController()
         )
     }
