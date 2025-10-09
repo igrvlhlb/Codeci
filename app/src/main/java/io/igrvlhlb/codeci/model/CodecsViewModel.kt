@@ -59,6 +59,8 @@ class CodecsViewModel : ViewModel() {
         _state.value = actualState
     }
 
+    fun getCodecsInfoJson() = codecInfoRepository.serializeToJson()
+
     private fun codecTypeStateToRepository(value: String): CodecInfoRepository.CodecType {
         return when(value) {
             CodecType.ALL.value -> CodecInfoRepository.CodecType.ALL

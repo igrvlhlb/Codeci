@@ -148,6 +148,8 @@ class CodecInfoRepository {
             t1.supportedTypes[0].compareTo(t2.supportedTypes[0])
     }
 
+    fun serializeToJson() = Json.encodeToString(allCodecsInfo)
+
     enum class MediaType {
         ALL,
         AUDIO,

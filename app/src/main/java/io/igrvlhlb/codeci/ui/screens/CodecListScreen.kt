@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -60,7 +61,28 @@ import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
 fun CodecListScreen(viewModel: CodecsViewModel, navController: NavHostController) {
-    Scaffold { innerPadding ->
+    val context = androidx.compose.ui.platform.LocalContext.current
+    Scaffold(
+        topBar = {
+            io.igrvlhlb.codeci.TopAppBar(
+                actions = {
+                    Button(
+                        onClick = {
+                            val shareText = viewModel.getCodecsInfoJson()
+                            val shareIntent = android.content.Intent().apply {
+                                action = android.content.Intent.ACTION_SEND
+                                putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+                                type = "text/json"
+                            }
+                            context.startActivity(android.content.Intent.createChooser(shareIntent, null))
+                        }
+                    ) {
+                        Text("Share All")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
         Column(
             Modifier
                 .padding(innerPadding)
