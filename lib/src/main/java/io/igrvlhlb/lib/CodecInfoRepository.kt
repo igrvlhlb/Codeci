@@ -5,6 +5,7 @@ import android.media.MediaCodecList
 import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
 import io.igrvlhlb.lib.data.CodecInfo
 import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
+import io.igrvlhlb.lib.utils.JsonSerializer
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -148,7 +149,14 @@ class CodecInfoRepository {
             t1.supportedTypes[0].compareTo(t2.supportedTypes[0])
     }
 
-    fun serializeToJson() = Json.encodeToString(allCodecsInfo)
+    fun serializeToJson(
+        prettyPrint: Boolean = false,
+        explicitNulls: Boolean = false
+    ) = JsonSerializer.serialize(
+        allCodecsInfo,
+        prettyPrint,
+        explicitNulls
+    )
 
     enum class MediaType {
         ALL,

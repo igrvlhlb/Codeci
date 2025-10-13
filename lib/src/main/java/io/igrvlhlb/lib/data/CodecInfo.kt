@@ -6,12 +6,10 @@ import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CQ
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR
 import io.igrvlhlb.lib.codeci.utils.roundTo
 import io.igrvlhlb.lib.data.mapper.MediaFormat
+import io.igrvlhlb.lib.utils.JsonSerializer
 import io.igrvlhlb.lib.utils.sdkAtLeast
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 
 
 /**
@@ -27,32 +25,7 @@ data class CodecInfo(
     val capabilities: List<CodecCapabilitiesInfo>
 ) {
     fun serialize(optPrettyPrint: Boolean = false, optExplicitNulls: Boolean = false): String {
-        return when {
-            optPrettyPrint && optExplicitNulls -> {
-                PRETTY_JSON_EXPLICIT_NULLS.encodeToString(this)
-            }
-            optPrettyPrint -> PRETTY_JSON.encodeToString(this)
-            optExplicitNulls -> PLAIN_JSON.encodeToString(this)
-            else -> PLAIN_JSON_NO_NULLS.encodeToString(this)
-        }
-    }
-
-    @OptIn(ExperimentalSerializationApi::class)
-    companion object {
-        private val PLAIN_JSON = Json
-        private val PLAIN_JSON_NO_NULLS = Json {
-            explicitNulls = false
-        }
-        private val PRETTY_JSON = Json {
-            prettyPrint = true
-            explicitNulls = false
-            prettyPrintIndent = "\t"
-        }
-        private val PRETTY_JSON_EXPLICIT_NULLS = Json {
-            prettyPrint = true
-            explicitNulls = true
-            prettyPrintIndent = "\t"
-        }
+        return JsonSerializer.serialize(this, optPrettyPrint, optExplicitNulls)
     }
 }
 

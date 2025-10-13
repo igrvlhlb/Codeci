@@ -59,7 +59,7 @@ class CodecsViewModel : ViewModel() {
         _state.value = actualState
     }
 
-    fun getCodecsInfoJson() = codecInfoRepository.serializeToJson()
+    fun getCodecsInfoJson() = codecInfoRepository.serializeToJson(explicitNulls = false)
 
     private fun codecTypeStateToRepository(value: String): CodecInfoRepository.CodecType {
         return when(value) {
