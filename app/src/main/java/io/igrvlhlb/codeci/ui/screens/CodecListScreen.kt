@@ -53,8 +53,11 @@ import com.example.codeci.ui.main.CodecsViewModel
 import io.igrvlhlb.codeci.model.CodecType
 import io.igrvlhlb.codeci.model.HWAccel
 import io.igrvlhlb.codeci.model.MediaType
+import io.igrvlhlb.codeci.ui.composables.ShareDialog
 import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
 import io.igrvlhlb.codeci.ui.composables.minAspectRatio
+import io.igrvlhlb.codeci.ui.composables.shareAsJsonFile
+import io.igrvlhlb.codeci.ui.composables.shareAsJsonText
 import io.igrvlhlb.codeci.ui.theme.CodeciTheme
 import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
 import my.nanihadesuka.compose.ScrollbarSettings
@@ -62,21 +65,28 @@ import my.nanihadesuka.compose.ScrollbarSettings
 @Composable
 fun CodecListScreen(viewModel: CodecsViewModel, navController: NavHostController) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    var showShareDialog by remember { mutableStateOf(false) }
+
+    if (showShareDialog) {
+        val jsonString = viewModel.getCodecsInfoJson()
+        ShareDialog(
+            onDismiss = { showShareDialog = false },
+            onShareAsText = {
+                showShareDialog = false
+                shareAsJsonText(context, jsonString)
+            },
+            onShareAsJsonFile = {
+                showShareDialog = false
+                shareAsJsonFile(context, jsonString)
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             io.igrvlhlb.codeci.TopAppBar(
                 actions = {
-                    Button(
-                        onClick = {
-                            val shareText = viewModel.getCodecsInfoJson()
-                            val shareIntent = android.content.Intent().apply {
-                                action = android.content.Intent.ACTION_SEND
-                                putExtra(android.content.Intent.EXTRA_TEXT, shareText)
-                                type = "text/json"
-                            }
-                            context.startActivity(android.content.Intent.createChooser(shareIntent, null))
-                        }
-                    ) {
+                    Button(onClick = { showShareDialog = true }) {
                         Text("Share All")
                     }
                 }
