@@ -1,4 +1,11 @@
 package io.igrvlhlb.lib.data
+/*
+ * This file is part of the Codec(i) project
+ *
+ * Copyright (C) 2025 Igor A. Vilhalba
+ *
+ * SPDX-License-Identifier: LGPL-3.0-or-later
+ */
 
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR
 import android.media.MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR_FD
