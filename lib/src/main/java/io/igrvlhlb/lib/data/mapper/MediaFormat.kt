@@ -105,7 +105,6 @@ class MediaFormat(private val mediaFormat: MediaFormat) {
                 ALL_KEYS_MAP[key]?.let { type -> MediaFormatValue.extractValue(mediaFormat, key, type) }
             }
             if (mediaFormatValue != null) {
-                val tmp = mediaFormatValue
                 key to mediaFormatValue
             } else null
         }.toMap()
@@ -174,8 +173,9 @@ sealed class MediaFormatValue<T: Any>(val value: T) {
                 extractValue(mediaFormat, key, it)
             }
         }
-        fun extractValue(mediaFormat: MediaFormat, key: String, type: MediaFormatTypes): MediaFormatValue<*>? =
-            fragile {
+        fun extractValue(mediaFormat: MediaFormat, key: String, type: MediaFormatTypes): MediaFormatValue<*>? {
+            if (!mediaFormat.containsKey(key)) return null
+            return fragile {
                 when (type) {
                     MediaFormatTypes.STRING -> {
                         StringValue(mediaFormat.getString(key)!!)
@@ -198,6 +198,7 @@ sealed class MediaFormatValue<T: Any>(val value: T) {
                     }
                 }
             }
+        }
     }
 }
 

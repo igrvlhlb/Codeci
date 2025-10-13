@@ -28,12 +28,12 @@ data class CodecInfo(
 ) {
     fun serialize(optPrettyPrint: Boolean = false, optExplicitNulls: Boolean = false): String {
         return when {
-            optPrettyPrint -> PRETTY_JSON.encodeToString(this)
-            optExplicitNulls -> PLAIN_JSON.encodeToString(this)
             optPrettyPrint && optExplicitNulls -> {
                 // optExplicitNull don't seem to have effect in this case
                 PRETTY_JSON_EXPLICIT_NULLS.encodeToString(this)
             }
+            optPrettyPrint -> PRETTY_JSON.encodeToString(this)
+            optExplicitNulls -> PLAIN_JSON.encodeToString(this)
             else -> PLAIN_JSON_NO_NULLS.encodeToString(this)
         }
     }
