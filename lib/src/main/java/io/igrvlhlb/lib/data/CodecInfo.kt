@@ -110,7 +110,7 @@ data class VideoCapabilitiesInfo(
     val heightAlignment: Int,
     val maxSupportedFrameRates: List<PerformancePoint>,
     val achievableFrameRates: List<PerformancePoint>,
-    val supportedPerformancePoints: List<String>?,
+    val supportedPerformancePoints: List<ReportedPerformancePoint>?,
 )
 
 /**
@@ -136,8 +136,11 @@ enum class BitrateMode(val value: Int) {
 data class Resolution(val width: Int, val height: Int)
 
 @Serializable
-data class PerformancePoint(val width: Int, val height: Int, val frameRates: ValueRange<Double>) {
-
+data class PerformancePoint(
+    val width: Int,
+    val height: Int,
+    val frameRates: ValueRange<Double>,
+) {
     constructor(resolution: Resolution, frameRates: ValueRange<Double>) : this(
         resolution.width,
         resolution.height,
@@ -150,10 +153,31 @@ data class PerformancePoint(val width: Int, val height: Int, val frameRates: Val
     override fun toString(): String {
         val frameRateString = if (frameRates.upper == 0.0) {
             "Unknown"
-        } else {
+        } else if (frameRates.upper != frameRates.lower) {
             "[${frameRates.lower.roundTo(2)} - ${frameRates.upper.roundTo(2)}]"
+        } else {
+            frameRates.lower.roundTo(2).toString()
         }
-        return "${width}x${height} @ $frameRateString fps"
+        return "${width}x${height}@${frameRateString} fps"
+    }
+}
+
+@Serializable
+data class ReportedPerformancePoint(
+    val width: Int,
+    val height: Int,
+    val frameRate: Double,
+    val maxFrameRate: Double? = null,
+    val blockWidth: Int? = null,
+    val blockHeight: Int? = null,
+) {
+    override fun toString(): String {
+        val base = "PerformancePoint(${width}x${height}@${frameRate.roundTo(0).toInt()}fps"
+        val maxFpsPart = maxFrameRate?.let { ", max ${it.roundTo(0).toInt()}fps" } ?: ""
+        val blockPart = if (blockWidth != null && blockHeight != null) {
+            ", ${blockWidth}x${blockHeight} blocks"
+        } else ""
+        return base + maxFpsPart + blockPart + ")"
     }
 }
 
