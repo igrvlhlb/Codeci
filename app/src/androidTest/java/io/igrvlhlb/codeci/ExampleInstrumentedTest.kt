@@ -1,4 +1,11 @@
 package io.igrvlhlb.codeci
+/*
+ * This file is part of the Codec(i) project
+ *
+ * Copyright (C) 2025 Igor A. Vilhalba
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,11 @@
 package io.igrvlhlb.codeci.ui.composables
+/*
+ * This file is part of the Codec(i) project
+ *
+ * Copyright (C) 2025 Igor A. Vilhalba
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 
 import android.content.Context
 import android.content.Intent
