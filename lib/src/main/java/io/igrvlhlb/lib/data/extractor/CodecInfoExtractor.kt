@@ -12,6 +12,7 @@ import io.igrvlhlb.lib.data.CodecInfo
 import io.igrvlhlb.lib.data.CommonResolutions
 import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
 import io.igrvlhlb.lib.data.PerformancePoint
+import io.igrvlhlb.lib.data.ReportedPerformancePoint
 import io.igrvlhlb.lib.data.ValueRange
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.mapper.CodecConstantsMapper.colorFormatToString
@@ -130,8 +131,8 @@ class CodecInfoExtractor {
      */
     private fun extractPerformancePoints(
         videoCapabilities: MediaCodecInfo.VideoCapabilities
-    ): List<String>? = if (Build.VERSION.SDK_INT >= 29) {
-        videoCapabilities.supportedPerformancePoints?.map { it.toString() }
+    ): List<ReportedPerformancePoint>? = if (Build.VERSION.SDK_INT >= 29) {
+        videoCapabilities.supportedPerformancePoints?.mapNotNull { PerformancePointParser(it).parse() }
     } else {
         null
     }
