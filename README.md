@@ -6,6 +6,7 @@ A simple app and library for fetching and sharing Android devices codecs data.
 - [ ] Add support for TVs
 - [ ] Add deserialization to the library 
 - [ ] Allow the app to receive shared json data and open the codec details screen
+- [ ] Publish the library to Maven Central
 
 ## Screenshots
 <div style="display: flex; gap: 10px;">
