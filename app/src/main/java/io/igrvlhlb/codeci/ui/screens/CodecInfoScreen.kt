@@ -34,8 +34,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -46,7 +48,10 @@ import androidx.compose.ui.window.Dialog
 import com.example.codeci.ui.main.CodecsViewModel
 import io.igrvlhlb.codeci.TopAppBar
 import io.igrvlhlb.codeci.ui.composables.RoundingFrame
+import io.igrvlhlb.codeci.ui.composables.ShareDialog
 import io.igrvlhlb.codeci.ui.composables.VerticalLazyListScrollBar
+import io.igrvlhlb.codeci.ui.composables.shareAsJsonFile
+import io.igrvlhlb.codeci.ui.composables.shareAsJsonText
 import io.igrvlhlb.lib.codeci.utils.roundTo
 import io.igrvlhlb.lib.data.AudioCapabilitiesInfo
 import io.igrvlhlb.lib.data.BitrateMode
@@ -59,20 +64,28 @@ import my.nanihadesuka.compose.ScrollbarSettings
 @Composable
 fun CodecInfoScreen(viewModel: CodecsViewModel) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    var showShareDialog by remember { mutableStateOf(false) }
+
+    if (showShareDialog) {
+        val jsonString = viewModel.codecInfo.serialize(optPrettyPrint = true, optExplicitNulls = false)
+        ShareDialog(
+            onDismiss = { showShareDialog = false },
+            onShareAsText = {
+                showShareDialog = false
+                shareAsJsonText(context, jsonString)
+            },
+            onShareAsJsonFile = {
+                showShareDialog = false
+                shareAsJsonFile(context, jsonString)
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 actions = {
-                    androidx.compose.material3.IconButton(onClick = {
-                        val codec = viewModel.codecInfo
-                        val shareText = codec.serialize(optPrettyPrint = true)
-                        val shareIntent = android.content.Intent().apply {
-                            action = android.content.Intent.ACTION_SEND
-                            putExtra(android.content.Intent.EXTRA_TEXT, shareText)
-                            type = "text/json"
-                        }
-                        context.startActivity(android.content.Intent.createChooser(shareIntent, null))
-                    }) {
+                    androidx.compose.material3.IconButton(onClick = { showShareDialog = true }) {
                         Icon(
                             imageVector = Icons.Filled.Share,
                             contentDescription = "Share"
