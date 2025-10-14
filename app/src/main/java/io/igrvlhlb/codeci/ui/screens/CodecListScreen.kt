@@ -67,10 +67,11 @@ import io.igrvlhlb.codeci.ui.composables.shareAsJsonFile
 import io.igrvlhlb.codeci.ui.composables.shareAsJsonText
 import io.igrvlhlb.codeci.ui.theme.CodeciTheme
 import io.igrvlhlb.lib.codeci.utils.isSoftwareCodec
+import io.igrvlhlb.lib.data.CodecInfo
 import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
-fun CodecListScreen(viewModel: CodecsViewModel, navController: NavHostController) {
+fun CodecListScreen(viewModel: CodecsViewModel, onClick: (CodecInfo) -> Unit = {}) {
     val context = androidx.compose.ui.platform.LocalContext.current
     var showShareDialog by remember { mutableStateOf(false) }
 
@@ -106,7 +107,7 @@ fun CodecListScreen(viewModel: CodecsViewModel, navController: NavHostController
                 .fillMaxSize()
         ) {
             FilterMenu(viewModel)
-            CodecsList(viewModel, navController, Modifier.padding(top = 8.dp))
+            CodecsList(viewModel, onClick, Modifier.padding(top = 8.dp))
         }
     }
 }
@@ -201,7 +202,7 @@ fun FilterMenuComboBox(
 @Composable
 fun CodecsList(
     viewModel: CodecsViewModel,
-    navController: NavHostController,
+    onClick: (CodecInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state
@@ -223,7 +224,7 @@ fun CodecsList(
                 ClickableCodecCard(
                     viewModel,
                     codecInfo,
-                    navController,
+                    onClick,
                     modifier = Modifier
                         .padding(12.dp)
                         .width(260.dp)
@@ -254,7 +255,7 @@ fun ExposedDropdownMenuBoxScope.MenuItemComboboxField(selectedValue: String, isE
 fun ClickableCodecCard(
     viewModel: CodecsViewModel,
     codecInfo: MediaCodecInfo,
-    navController: NavHostController,
+    onClick: (CodecInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val codecName = codecInfo.name
@@ -264,10 +265,9 @@ fun ClickableCodecCard(
         codecName,
         supportedTypes,
         isSoftwareCodec,
-        navController,
         modifier.clickable {
             viewModel.selectedCodec = codecInfo
-            navController.navigate("codecInfo/$codecName")
+            onClick(viewModel.codecInfo)
         }
     )
 }
@@ -277,7 +277,6 @@ fun CodecCard(
     codecName: String,
     supportedTypes: List<String>,
     isSoftwareCodec: Boolean,
-    navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
     val typeSuffix = if (supportedTypes.size > 1) " (+${supportedTypes.size})" else ""
@@ -355,7 +354,6 @@ fun CodecCardPreview() {
         codecName = "OMX.google.h264.encoder",
         supportedTypes = listOf("video/avc"),
         isSoftwareCodec = false,
-        rememberNavController(),
         modifier = Modifier.padding(16.dp)
     )
 }
@@ -374,7 +372,7 @@ fun MainPreview() {
     CodeciTheme {
         CodecListScreen(
             viewModel = CodecsViewModel(),
-            navController = rememberNavController()
+            onClick = {}
         )
     }
 }

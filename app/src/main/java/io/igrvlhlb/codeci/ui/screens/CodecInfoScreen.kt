@@ -63,18 +63,19 @@ import io.igrvlhlb.lib.codeci.utils.roundTo
 import io.igrvlhlb.lib.data.AudioCapabilitiesInfo
 import io.igrvlhlb.lib.data.BitrateMode
 import io.igrvlhlb.lib.data.CodecCapabilitiesInfo
+import io.igrvlhlb.lib.data.CodecInfo
 import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
 import my.nanihadesuka.compose.ScrollbarSettings
 
 @Composable
-fun CodecInfoScreen(viewModel: CodecsViewModel) {
+fun CodecInfoScreen(codecInfo: CodecInfo) {
     val context = androidx.compose.ui.platform.LocalContext.current
     var showShareDialog by remember { mutableStateOf(false) }
 
     if (showShareDialog) {
-        val jsonString = viewModel.codecInfo.serialize(optPrettyPrint = true, optExplicitNulls = false)
+        val jsonString = codecInfo.serialize(optPrettyPrint = true, optExplicitNulls = false)
         ShareDialog(
             onDismiss = { showShareDialog = false },
             onShareAsText = {
@@ -102,13 +103,13 @@ fun CodecInfoScreen(viewModel: CodecsViewModel) {
             )
         }
     ) {
-        CodecInfoScreen(viewModel = viewModel, innerPadding = it)
+        CodecInfoScreen(codecInfo, innerPadding = it)
     }
 }
 
 @Composable
-private fun CodecInfoScreen(viewModel: CodecsViewModel, innerPadding: PaddingValues) {
-    val codec = viewModel.codecInfo
+private fun CodecInfoScreen(codecInfo: CodecInfo, innerPadding: PaddingValues) {
+    val codec = codecInfo
     val scrollState = rememberScrollState()
     Log.d("CodecInfoScreen", codec.serialize())
     Column(
@@ -467,7 +468,7 @@ fun EncoderCodecCapabilitiesView(capabilities: EncoderCapabilitiesInfo) {
 fun CodecInfoScreenPreview() {
     val viewModel = CodecsViewModel()
     viewModel.selectedCodec = viewModel.allCodecsSet.first()
-    CodecInfoScreen(viewModel = viewModel, innerPadding = PaddingValues(16.dp))
+    CodecInfoScreen(viewModel.codecInfo, innerPadding = PaddingValues(16.dp))
 }
 
 @Preview(showBackground = true)
