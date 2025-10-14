@@ -7,7 +7,6 @@ package io.igrvlhlb.lib.data.mapper
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
-import android.annotation.SuppressLint
 import android.media.MediaCodecInfo.CodecCapabilities.FEATURE_AdaptivePlayback
 import android.media.MediaCodecInfo.CodecCapabilities.FEATURE_DetachedSurface
 import android.media.MediaCodecInfo.CodecCapabilities.FEATURE_DynamicColorAspects
@@ -79,11 +78,13 @@ import android.media.MediaFormat.TYPE_FLOAT
 import android.media.MediaFormat.TYPE_INTEGER
 import android.media.MediaFormat.TYPE_LONG
 import android.media.MediaFormat.TYPE_STRING
+import android.os.Parcelable
 import androidx.annotation.RequiresApi
 import io.igrvlhlb.lib.utils.fragile
 import io.igrvlhlb.lib.utils.sdkAtLeast
 import io.igrvlhlb.lib.utils.sdkAtLeastOrNull
-import kotlinx.serialization.InternalSerializationApi
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -93,8 +94,9 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
 import java.nio.ByteBuffer
 
+@Parcelize
 @Serializable(with = MediaFormatSerializer::class)
-class MediaFormat(private val mediaFormat: MediaFormat) {
+class MediaFormat(private val mediaFormat: @RawValue MediaFormat) : Parcelable {
 
     override fun toString(): String {
         return getMappings().map {

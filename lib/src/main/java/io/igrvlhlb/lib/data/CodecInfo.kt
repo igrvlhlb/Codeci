@@ -15,13 +15,16 @@ import io.igrvlhlb.lib.codeci.utils.roundTo
 import io.igrvlhlb.lib.data.mapper.MediaFormat
 import io.igrvlhlb.lib.utils.JsonSerializer
 import io.igrvlhlb.lib.utils.sdkAtLeast
-import kotlinx.serialization.ExperimentalSerializationApi
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 import kotlinx.serialization.Serializable
 
 
 /**
  * Structured representation of codec information extracted from MediaCodecInfo
  */
+@Parcelize
 @Serializable
 data class CodecInfo(
     val name: String,
@@ -30,7 +33,7 @@ data class CodecInfo(
     val isEncoder: Boolean,
     val basicInfo: BasicCodecInfo?,
     val capabilities: List<CodecCapabilitiesInfo>
-) {
+) : Parcelable {
     fun serialize(optPrettyPrint: Boolean = false, optExplicitNulls: Boolean = false): String {
         return JsonSerializer.serialize(this, optPrettyPrint, optExplicitNulls)
     }
@@ -39,17 +42,19 @@ data class CodecInfo(
 /**
  * Basic codec information available on all Android versions
  */
+@Parcelize
 @Serializable
 data class BasicCodecInfo(
     val canonicalName: String,
     val isHardwareAccelerated: Boolean,
     val isSoftwareOnly: Boolean,
     val isVendor: Boolean
-)
+) : Parcelable
 
 /**
  * Information about codec capabilities for a specific MIME type
  */
+@Parcelize
 @Serializable
 data class CodecCapabilitiesInfo(
     val supportedType: String,
@@ -61,11 +66,12 @@ data class CodecCapabilitiesInfo(
     val audioCapabilities: AudioCapabilitiesInfo?,
     val videoCapabilities: VideoCapabilitiesInfo?,
     val encoderCapabilities: EncoderCapabilitiesInfo?
-)
+) : Parcelable
 
 /**
  * Audio-specific codec capabilities
  */
+@Parcelize
 @Serializable
 data class AudioCapabilitiesInfo(
     val bitrateRange: ValueRange<Int>,
@@ -74,11 +80,12 @@ data class AudioCapabilitiesInfo(
     val supportedSampleRateRanges: List<ValueRange<Int>>?,
     val minInputChannelCount: Int?,
     val inputChannelCountRanges: List<ValueRange<Int>>?
-)
+) : Parcelable
 
 /**
  * Video-specific codec capabilities
  */
+@Parcelize
 @Serializable
 data class VideoCapabilitiesInfo(
     val bitrateRange: ValueRange<Int>,
@@ -90,22 +97,24 @@ data class VideoCapabilitiesInfo(
     val maxSupportedFrameRates: List<PerformancePoint>,
     val achievableFrameRates: List<PerformancePoint>,
     val supportedPerformancePoints: List<ReportedPerformancePoint>?,
-)
+) : Parcelable
 
 /**
  * Encoder-specific capabilities
  */
+@Parcelize
 @Serializable
 data class EncoderCapabilitiesInfo(
     val complexityRange: ValueRange<Int>?,
     val qualityRange: ValueRange<Int>?,
     val isBitrateModeSupported: Map<BitrateMode, Boolean>
-)
+) : Parcelable
 
 /**
  * Bitrate modes for encoders
  */
-enum class BitrateMode(val value: Int) {
+@Parcelize
+enum class BitrateMode(val value: Int) : Parcelable {
     CQ(BITRATE_MODE_CQ),
     VBR(BITRATE_MODE_VBR),
     CBR(BITRATE_MODE_CBR),
@@ -114,12 +123,13 @@ enum class BitrateMode(val value: Int) {
 
 data class Resolution(val width: Int, val height: Int)
 
+@Parcelize
 @Serializable
 data class PerformancePoint(
     val width: Int,
     val height: Int,
     val frameRates: ValueRange<Double>,
-) {
+) : Parcelable {
     constructor(resolution: Resolution, frameRates: ValueRange<Double>) : this(
         resolution.width,
         resolution.height,
@@ -141,6 +151,7 @@ data class PerformancePoint(
     }
 }
 
+@Parcelize
 @Serializable
 data class ReportedPerformancePoint(
     val width: Int,
@@ -149,7 +160,7 @@ data class ReportedPerformancePoint(
     val maxFrameRate: Double? = null,
     val blockWidth: Int? = null,
     val blockHeight: Int? = null,
-) {
+) : Parcelable {
     override fun toString(): String {
         val base = "PerformancePoint(${width}x${height}@${frameRate.roundTo(0).toInt()}fps"
         val maxFpsPart = maxFrameRate?.let { ", max ${it.roundTo(0).toInt()}fps" } ?: ""
@@ -173,8 +184,9 @@ enum class CommonResolutions(val resolution: Resolution) {
 }
 
 
+@Parcelize
 @Serializable
-data class ValueRange<T: Comparable<T>>(val lower: T, val upper: T) {
+data class ValueRange<T: Comparable<T>>(val lower: @RawValue T, val upper: @RawValue T) : Parcelable {
     constructor(range: android.util.Range<T>) : this(range.lower, range.upper)
     constructor(range: Pair<T, T>) : this(range.first, range.second)
 
