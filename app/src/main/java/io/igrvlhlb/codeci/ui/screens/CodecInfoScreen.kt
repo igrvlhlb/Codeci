@@ -32,14 +32,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,11 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.codeci.ui.main.CodecsViewModel
+import io.igrvlhlb.codeci.R
 import io.igrvlhlb.codeci.TopAppBar
 import io.igrvlhlb.codeci.ui.composables.RoundingFrame
 import io.igrvlhlb.codeci.ui.composables.ShareDialog
@@ -68,6 +68,16 @@ import io.igrvlhlb.lib.data.EncoderCapabilitiesInfo
 import io.igrvlhlb.lib.data.VideoCapabilitiesInfo
 import io.igrvlhlb.lib.data.extractor.CodecInfoExtractor
 import my.nanihadesuka.compose.ScrollbarSettings
+
+
+@Composable
+fun CodecDetailsScreen(codecInfo: CodecInfo?) {
+    if (codecInfo == null) {
+        CodecInfoPlaceholderScreen()
+    } else {
+        CodecInfoScreen(codecInfo)
+    }
+}
 
 @Composable
 fun CodecInfoScreen(codecInfo: CodecInfo) {
@@ -92,23 +102,42 @@ fun CodecInfoScreen(codecInfo: CodecInfo) {
     Scaffold(
         topBar = {
             TopAppBar(
+                title = codecInfo.name,
                 actions = {
                     androidx.compose.material3.IconButton(onClick = { showShareDialog = true }) {
                         Icon(
-                            imageVector = Icons.Filled.Share,
+                            painter = painterResource(R.drawable.outline_share_24),
                             contentDescription = "Share"
                         )
                     }
                 }
             )
-        }
+        },
+        modifier = Modifier.sizeIn(minWidth = 300.dp)
     ) {
-        CodecInfoScreen(codecInfo, innerPadding = it)
+        CodecInfoScreenContent(codecInfo, innerPadding = it)
     }
 }
 
 @Composable
-private fun CodecInfoScreen(codecInfo: CodecInfo, innerPadding: PaddingValues) {
+private fun CodecInfoPlaceholderScreen() {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "No codec selected",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
+
+@Composable
+private fun CodecInfoScreenContent(codecInfo: CodecInfo, innerPadding: PaddingValues) {
     val codec = codecInfo
     val scrollState = rememberScrollState()
     Log.d("CodecInfoScreen", codec.serialize())
@@ -348,7 +377,7 @@ fun VideoCodecCapabilitiesView(capabilities: VideoCapabilitiesInfo) {
             )
             Spacer(Modifier.width(8.dp))
             Image(
-                imageVector = Icons.Filled.Info,
+                painter = painterResource(R.drawable.outline_info_24),
                 contentDescription = "About Achievable Frame Rates",
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary),
                 modifier = Modifier
@@ -468,7 +497,7 @@ fun EncoderCodecCapabilitiesView(capabilities: EncoderCapabilitiesInfo) {
 fun CodecInfoScreenPreview() {
     val viewModel = CodecsViewModel()
     viewModel.selectedCodec = viewModel.allCodecsSet.first()
-    CodecInfoScreen(viewModel.codecInfo, innerPadding = PaddingValues(16.dp))
+    CodecInfoScreenContent(viewModel.codecInfo, innerPadding = PaddingValues(16.dp))
 }
 
 @Preview(showBackground = true)
