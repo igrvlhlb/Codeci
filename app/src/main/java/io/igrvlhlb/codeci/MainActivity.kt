@@ -76,10 +76,10 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 /** The divider cannot be dragged closer than this to the left (start) edge. */
-private val DividerMinDistanceFromStart = 360.dp
+private val DividerMinDistanceFromStart = 300.dp
 
 /** The divider cannot be dragged closer than this to the right (end) edge. */
-private val DividerMinDistanceFromEnd = 360.dp
+private val DividerMinDistanceFromEnd = 300.dp
 
 class MainActivity : ComponentActivity() {
 
@@ -94,7 +94,10 @@ class MainActivity : ComponentActivity() {
                 val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator<CodecInfo>()
                 val scope = rememberCoroutineScope()
                 val paneAnchors = remember {
-                    listOf(PaneExpansionAnchor.Proportion(0.4f), PaneExpansionAnchor.Proportion(0.6f))
+                    listOf(
+                        PaneExpansionAnchor.Offset.fromStart(320.dp),
+                        PaneExpansionAnchor.Proportion(0.6f)
+                    )
                 }
                 val paneExpansionState = rememberPaneExpansionState(anchors = paneAnchors)
                 var scaffoldBounds by remember { mutableStateOf<Rect?>(null) }
