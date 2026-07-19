@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -91,7 +92,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CodeciTheme {
-                val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator<CodecInfo>()
+                val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+                // On compact-height windows (e.g. phones in landscape) a split pane is too
+                // cramped: keep a single pane and open the details full-screen instead.
+                val useSinglePane =
+                    windowAdaptiveInfo.windowSizeClass.windowHeightSizeClass ==
+                        WindowHeightSizeClass.COMPACT
+                val directive = calculatePaneScaffoldDirective(windowAdaptiveInfo)
+                val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator<CodecInfo>(
+                    scaffoldDirective =
+                        if (useSinglePane) directive.copy(maxHorizontalPartitions = 1) else directive
+                )
                 val scope = rememberCoroutineScope()
                 val paneAnchors = remember {
                     listOf(

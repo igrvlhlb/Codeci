@@ -22,10 +22,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,6 +38,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuBoxScope
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -54,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.codeci.ui.main.CodecsViewModel
@@ -75,6 +80,9 @@ import my.nanihadesuka.compose.ScrollbarSettings
  * to fit two cells of this size, then adds columns as width allows.
  */
 private val CodecCardMinWidth = 240.dp
+
+/** Width of the filter column when it sits beside the list on compact-height windows. */
+private val FilterSidebarWidth = 220.dp
 
 @Composable
 fun CodecListScreen(viewModel: CodecsViewModel, onClick: (CodecInfo) -> Unit = {}) {
@@ -107,20 +115,34 @@ fun CodecListScreen(viewModel: CodecsViewModel, onClick: (CodecInfo) -> Unit = {
             )
         }
     ) { innerPadding ->
-        Column(
-            Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            FilterMenu(viewModel)
-            CodecsList(viewModel, onClick, Modifier.padding(top = 8.dp))
+        val isHeightCompact =
+            currentWindowAdaptiveInfo().windowSizeClass.windowHeightSizeClass ==
+                WindowHeightSizeClass.COMPACT
+        if (isHeightCompact) {
+            // Short windows (e.g. phones in landscape): filters on the left, list on the right.
+            Row(
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
+                FilterMenuSidebar(viewModel)
+                CodecsList(viewModel, onClick, Modifier.weight(1f))
+            }
+        } else {
+            Column(
+                Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
+                FilterMenu(viewModel)
+                CodecsList(viewModel, onClick, Modifier.padding(top = 8.dp))
+            }
         }
     }
 }
 
 @Composable
 fun FilterMenu(viewModel: CodecsViewModel) {
-    val state by viewModel.state
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
@@ -128,39 +150,82 @@ fun FilterMenu(viewModel: CodecsViewModel) {
             .padding(horizontal = 12.dp)
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            FilterMenuItem(
-                text = "Codec Type",
-                selectedValue = state.codecType,
-                values = CodecType.entries.map { it.value }
-            ) {
-                viewModel.updateState(state.copy(codecType = it))
-            }
+            CodecTypeFilter(viewModel)
             Spacer(modifier = Modifier.size(8.dp))
-            FilterMenuItem(
-                text = "Media Type",
-                selectedValue = state.mediaType,
-                values = MediaType.entries.map { it.value }
-            ) {
-                viewModel.updateState(state.copy(mediaType = it))
-            }
+            MediaTypeFilter(viewModel)
         }
         Column(modifier = Modifier.weight(1f)) {
-            FilterMenuItem(
-                text = "Mime Types",
-                selectedValue = state.mimeType,
-                values = listOf("All") + state.mimeTypeList
-            ) {
-                viewModel.updateState(state.copy(mimeType = it))
-            }
+            MimeTypesFilter(viewModel)
             Spacer(modifier = Modifier.size(8.dp))
-            FilterMenuItem(
-                text = "HW Accelerated",
-                selectedValue = state.hwAccel,
-                values = HWAccel.entries.map { it.value }
-            ) {
-                viewModel.updateState(state.copy(hwAccel = it))
-            }
+            HwAccelFilter(viewModel)
         }
+    }
+}
+
+/** Single-column variant of [FilterMenu], meant to sit beside the list on compact-height windows. */
+@Composable
+fun FilterMenuSidebar(viewModel: CodecsViewModel, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .width(FilterSidebarWidth)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 12.dp)
+    ) {
+        CodecTypeFilter(viewModel)
+        Spacer(modifier = Modifier.size(8.dp))
+        MimeTypesFilter(viewModel)
+        Spacer(modifier = Modifier.size(8.dp))
+        MediaTypeFilter(viewModel)
+        Spacer(modifier = Modifier.size(8.dp))
+        HwAccelFilter(viewModel)
+    }
+}
+
+@Composable
+private fun CodecTypeFilter(viewModel: CodecsViewModel) {
+    val state by viewModel.state
+    FilterMenuItem(
+        text = "Codec Type",
+        selectedValue = state.codecType,
+        values = CodecType.entries.map { it.value }
+    ) {
+        viewModel.updateState(state.copy(codecType = it))
+    }
+}
+
+@Composable
+private fun MimeTypesFilter(viewModel: CodecsViewModel) {
+    val state by viewModel.state
+    FilterMenuItem(
+        text = "Mime Types",
+        selectedValue = state.mimeType,
+        values = listOf("All") + state.mimeTypeList
+    ) {
+        viewModel.updateState(state.copy(mimeType = it))
+    }
+}
+
+@Composable
+private fun MediaTypeFilter(viewModel: CodecsViewModel) {
+    val state by viewModel.state
+    FilterMenuItem(
+        text = "Media Type",
+        selectedValue = state.mediaType,
+        values = MediaType.entries.map { it.value }
+    ) {
+        viewModel.updateState(state.copy(mediaType = it))
+    }
+}
+
+@Composable
+private fun HwAccelFilter(viewModel: CodecsViewModel) {
+    val state by viewModel.state
+    FilterMenuItem(
+        text = "HW Accelerated",
+        selectedValue = state.hwAccel,
+        values = HWAccel.entries.map { it.value }
+    ) {
+        viewModel.updateState(state.copy(hwAccel = it))
     }
 }
 
