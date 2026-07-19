@@ -231,7 +231,7 @@ fun CodecsList(
                 thumbSelectedColor = MaterialTheme.colorScheme.secondary
             )
         ) {
-            items(state.codecsList) { codecInfo ->
+            items(state.codecsList, key = { it.name }) { codecInfo ->
                 ClickableCodecCard(
                     viewModel,
                     codecInfo,
